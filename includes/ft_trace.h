@@ -108,20 +108,20 @@ struct icmphdr
 
 struct iphdr
 {
-#if BYTE_ORDER == LITTLE_ENDIAN
+# if BYTE_ORDER == LITTLE_ENDIAN
 	u_char  hl:4,			/* header length */
 			version:4;		/* version */
-#endif
-#if BYTE_ORDER == BIG_ENDIAN
+# endif
+# if BYTE_ORDER == BIG_ENDIAN
 	u_char  version:4,		/* version */
 			hl:4;			/* header length */
-#endif
+# endif
 	u_char  service;		/* type of service */
 	u_short len;			/* total length */
 	u_short pid;			/* identification */
 	u_short off;			/* fragment offset field */
-#define	IP_DF 0x4000		/* dont fragment flag */
-#define	IP_MF 0x2000		/* more fragments flag */
+# define	IP_DF 0x4000	/* dont fragment flag */
+# define	IP_MF 0x2000	/* more fragments flag */
 	u_char  ttl;			/* time to live */
 	u_char  protocol;		/* protocol */
 	u_short checksum;		/* checksum */
@@ -147,7 +147,7 @@ struct iphdr
 # define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
 # define NR_ICMP_TYPES		18
 
-#define ICMP_MINLEN			28
+# define ICMP_MINLEN		28
 
 /*
 ** Changes the default value set by the TCP/IP service provider in the
@@ -173,13 +173,6 @@ typedef struct				s_packet
 # endif
 	struct icmphdr			header;				/* header of message send 	*/
 }							t_packet;
-
-typedef struct				s_packet_received
-{
-	struct msghdr			header;		/* header of message received	*/
-	struct iovec			iov_buffers;/* container of messages 		*/
-	struct iovec			iov[1];		/* first container of messages 	*/
-}							t_packet_received;
 
 /*
 ** Flags
@@ -234,21 +227,30 @@ typedef struct				s_trace
 
 # define NB_TEST_CONNECTION	3
 
+/*
+** flags manager
+*/
 BOOLEAN						load_flags(t_trace *trace, int argc, char **argv);
 BOOLEAN						load_flag_list(t_trace *trace);
 BOOLEAN						icmp_initialize_connection(t_trace *trace, int ttl);
 BOOLEAN						set_flags_values(t_trace *trace);
 
-
+/*
+** trace.c
+*/
 t_trace						*singleton_trace(void);
 void						destruct_trace(t_trace *trace);
-BOOLEAN						process_icmp_request(t_trace *trace);
-BOOLEAN						send_icmp_message(t_trace *trace);
-void						trace_result(void);
+BOOLEAN						process_traceroute(t_trace *trace);
+BOOLEAN						process_three_request(t_trace *trace);
+BOOLEAN						sendto_message(t_trace *trace);
 
 /*
 ** Messages
 */
+# ifdef __linux__
+void						prepare_iphdr(t_packet *packet, t_trace *trace)
+# endif
+void						prepare_icmp_header(t_packet *packet, t_trace *trace);
 void						*prepare_packet_to_send(t_trace *trace, size_t size);
 void						destruct_packet_send(t_packet *packet);
 

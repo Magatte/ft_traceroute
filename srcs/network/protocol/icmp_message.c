@@ -13,7 +13,7 @@
 #include "ft_trace.h"
 
 #ifdef __linux__
-static void				prepare_iphdr(t_packet *packet, t_trace *trace)
+void		prepare_iphdr(t_packet *packet, t_trace *trace)
 {
 	packet->ip.src.s_addr = INADDR_ANY;
 
@@ -36,9 +36,7 @@ static void				prepare_iphdr(t_packet *packet, t_trace *trace)
 }
 #endif
 
-
-
-static void				prepare_icmp_header(t_packet *packet, t_trace *trace)
+void		prepare_icmp_header(t_packet *packet, t_trace *trace)
 {
 	packet->header.type = ICMP_ECHO;
 	packet->header.un.echo.id = htons(trace->pid);
@@ -51,31 +49,31 @@ static void				prepare_icmp_header(t_packet *packet, t_trace *trace)
 void		*prepare_packet_to_send(t_trace *trace, size_t size)
 {
 	t_packet 	*packet;
-	char		*pck;
+	char		*final_packet;
+	size_t		iphdr_size;
 
+	iphdr_size = 0;
 	if (!(packet = (t_packet*)malloc(sizeof(t_packet))))
 		return (NULL);
 	ft_bzero(packet, sizeof(*packet));
 #ifdef __linux__
+	iphdr_size = IPHDR_SIZE;
 	prepare_iphdr(packet, trace);
 #endif
 	prepare_icmp_header(packet, trace);
+
+	final_packet = ft_strnew(iphdr_size + ICMP_HEADER_SIZE + size);
+
 #ifdef __linux__
-	pck = ft_strnew(IPHDR_SIZE + ICMP_HEADER_SIZE + size);
-	ft_memcpy(pck, &packet->ip, IPHDR_SIZE);
-	ft_memcpy(pck + IPHDR_SIZE, &packet->header, ICMP_HEADER_SIZE);
-	ft_memset(pck + IPHDR_SIZE + ICMP_HEADER_SIZE, '0', size);
-	packet->header.checksum = checksum(pck + IPHDR_SIZE, ICMP_HEADER_SIZE + size);
-	ft_memcpy(pck + IPHDR_SIZE, &packet->header, ICMP_HEADER_SIZE);
+	ft_memcpy(final_packet, &packet->ip, IPHDR_SIZE);
 #else
-	pck = ft_strnew(ICMP_HEADER_SIZE + size);
-	ft_memcpy(pck, &packet->header, ICMP_HEADER_SIZE);
-	ft_memset(pck + ICMP_HEADER_SIZE, '0', size);
-	packet->header.checksum = checksum(pck, ICMP_HEADER_SIZE + size);
-	ft_memcpy(pck, &packet->header, ICMP_HEADER_SIZE);
+	ft_memcpy(final_packet + iphdr_size, &packet->header, ICMP_HEADER_SIZE);
+	ft_memset(final_packet + iphdr_size + ICMP_HEADER_SIZE, '0', size);
+	packet->header.checksum = checksum(final_packet + iphdr_size, ICMP_HEADER_SIZE + size);
+	ft_memcpy(final_packet + iphdr_size, &packet->header, ICMP_HEADER_SIZE);
 #endif
 	destruct_packet_send(packet);
-	return (pck);
+	return (final_packet);
 }
 
 void					destruct_packet_send(t_packet *packet)

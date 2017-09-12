@@ -24,7 +24,7 @@ t_trace		*singleton_trace(void)
 	trace->shost = NULL;
 	trace->destip = NULL;
 	trace->port = -1;
-	trace->launch = process_icmp_request;
+	trace->launch = process_traceroute;
 	trace->received = 0;
 	trace->send = 0;
 	trace->timeout.tv_sec = 5;
@@ -63,7 +63,31 @@ void		destruct_trace(t_trace *trace)
 	free(trace);
 }
 
-BOOLEAN		send_icmp_message(t_trace *trace)
+void		reset_trace_tab(t_trace *trace)
+{
+	int i;
+
+	i = 0;
+	while (i < NB_TEST_CONNECTION)
+	{
+		trace->ip_tab[i++] = NULL;
+	}
+}
+
+void		free_trace_tab(t_trace *trace)
+{
+	int i;
+
+	i = 0;
+	while (i < NB_TEST_CONNECTION)
+	{
+		if (trace->ip_tab[i] != NULL)
+			free(trace->ip_tab[i]);
+		i++;
+	}
+}
+
+BOOLEAN		sendto_message(t_trace *trace)
 {
 	int		cc;
 	void	*packet;
@@ -84,7 +108,7 @@ BOOLEAN		send_icmp_message(t_trace *trace)
 	return (true);
 }
 
-BOOLEAN		three_process_icmp_request(t_trace *trace)
+BOOLEAN		process_three_request(t_trace *trace)
 {
 	BOOLEAN retry = true;
 	int i;
@@ -98,7 +122,7 @@ BOOLEAN		three_process_icmp_request(t_trace *trace)
 	{
 		//Open socket connection
 		icmp_initialize_connection(trace, trace->ttl);
-		if (send_icmp_message(trace) != false\
+		if (sendto_message(trace) != false\
 			&& (trace->ip_tab[i] = icmp_handle_message(trace)) != NULL) {
 			responses++;
 			if (ft_strcmp(get_hostname_ipv4(trace->ip_tab[i]), tmp) == 0)
@@ -118,37 +142,14 @@ BOOLEAN		three_process_icmp_request(t_trace *trace)
 	return (retry);
 }
 
-void		reset_trace_tab(t_trace *trace)
-{
-	int i;
-
-	i = 0;
-	while (i < NB_TEST_CONNECTION)
-	{
-		trace->ip_tab[i++] = NULL;
-	}
-}
-
-void		free_trace_tab(t_trace *trace)
-{
-	int i;
-
-	i = 0;
-	while (i < NB_TEST_CONNECTION)
-	{
-		if (trace->ip_tab[i] != NULL)
-			free(trace->ip_tab[i++]);
-	}
-}
-
-BOOLEAN		process_icmp_request(t_trace *trace)
+BOOLEAN		process_traceroute(t_trace *trace)
 {
 	printf("traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
 	while (trace->ttl <= trace->max_hop)
 	{
 		reset_trace_tab(trace);
 		ft_printf("%2d ", trace->ttl);
-		if (three_process_icmp_request(trace) == false) {
+		if (process_three_request(trace) == false) {
 			free_trace_tab(trace);
 			break ;
 		}
