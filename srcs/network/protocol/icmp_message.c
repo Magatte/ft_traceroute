@@ -57,15 +57,15 @@ void		*prepare_packet_to_send(t_trace *trace, size_t size)
 		return (NULL);
 	ft_bzero(packet, sizeof(*packet));
 #ifdef __linux__
-	iphdr_size = IPHDR_SIZE;
-	prepare_iphdr(packet, trace);
+	//iphdr_size = IPHDR_SIZE;
+	//prepare_iphdr(packet, trace);
 #endif
 	prepare_icmp_header(packet, trace);
 
 	final_packet = ft_strnew(iphdr_size + ICMP_HEADER_SIZE + size);
 
 #ifdef __linux__
-	ft_memcpy(final_packet, &packet->ip, IPHDR_SIZE);
+	//ft_memcpy(final_packet, &packet->ip, IPHDR_SIZE);
 #endif
 	ft_memcpy(final_packet + iphdr_size, &packet->header, ICMP_HEADER_SIZE);
 	ft_memset(final_packet + iphdr_size + ICMP_HEADER_SIZE, '0', size);
