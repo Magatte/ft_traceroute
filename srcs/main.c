@@ -18,6 +18,9 @@ int	main(int argc, char **argv)
 
 	if (argc > 1)
 	{
+		if ((int)getuid() < 0) {
+			ft_printf("ft_traceroute: you do not have the necessary rights\n");
+		}
 		trace = singleton_trace();
 		if (trace == NULL)
 			return (0);
@@ -33,7 +36,7 @@ int	main(int argc, char **argv)
 		}
 		else
 		{
-			ft_fprintf(1, "ft_trace: cannot resolve %s: Unknow host\n", trace->shost);
+			ft_fprintf(1, "ft_traceroute: cannot resolve %s: Unknow host\n", trace->shost);
 		}
 		destruct_trace(trace);
 	}
