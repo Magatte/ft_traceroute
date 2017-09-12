@@ -38,7 +38,7 @@ static void				prepare_iphdr(t_packet *packet, t_trace *trace)
 
 
 
-static void				prepare_header(t_packet *packet, t_trace *trace)
+static void				prepare_icmp_header(t_packet *packet, t_trace *trace)
 {
 	packet->header.type = ICMP_ECHO;
 	packet->header.un.echo.id = htons(trace->pid);
@@ -59,7 +59,7 @@ void		*prepare_packet_to_send(t_trace *trace, size_t size)
 #ifdef __linux__
 	prepare_iphdr(packet, trace);
 #endif
-	prepare_header(packet, trace);
+	prepare_icmp_header(packet, trace);
 #ifdef __linux__
 	pck = ft_strnew(IPHDR_SIZE + ICMP_HEADER_SIZE + size);
 	ft_memcpy(pck, &packet->ip, IPHDR_SIZE);
