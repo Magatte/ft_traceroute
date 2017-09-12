@@ -248,7 +248,7 @@ BOOLEAN						sendto_message(t_trace *trace);
 ** Messages
 */
 # ifdef __linux__
-void						prepare_iphdr(t_packet *packet, t_trace *trace)
+void						prepare_iphdr(t_packet *packet, t_trace *trace);
 # endif
 void						prepare_icmp_header(t_packet *packet, t_trace *trace);
 void						*prepare_packet_to_send(t_trace *trace, size_t size);
