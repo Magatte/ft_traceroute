@@ -42,7 +42,7 @@ BOOLEAN			icmp_initialize_connection(t_trace *trace, int ttl)
 
 	opt = 1;
 
-	trace->sock = socket(PROT_INTERNET_IPV4, NETWORK_FLUX, ICMP_PROTOCOL);
+	trace->sock = socket(PROT_INTERNET_IPV4, NETWORK_FLUX, trace->protocol->proto);
 	if (!socket_connection_is_estabilised(trace->sock))
 		return (false);
 	if (setsockopt(trace->sock, 0, TCP_IP_PACKET_HEADER_SERVICE,\

@@ -37,6 +37,8 @@ t_trace		*singleton_trace(void)
 	trace->totaltime = 0;
 	trace->maxtime = 0;
 	trace->max_hop = 30;
+	trace->protocol = get_protocol(UDP);
+	trace->packet_len = 0;
 	if (!(trace->ip_tab = (struct in_addr**)malloc(sizeof(struct in_addr*) * NB_TEST_CONNECTION)))
 		return (NULL);
 	ft_bzero(&trace->addr, sizeof(trace->addr));
@@ -95,8 +97,9 @@ BOOLEAN		sendto_message(t_trace *trace)
 	trace->send++;
 	packet = prepare_packet_to_send(trace, trace->sweepminsize);
 	trace->start_time = get_current_time_millis();
-	cc = sendto(trace->sock, packet, sizeof(t_packet) + trace->sweepminsize, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
-	if (cc < 0 || cc != (int)(sizeof(t_packet) + trace->sweepminsize))
+	trace->packet_len += trace->sweepminsize;
+	cc = sendto(trace->sock, packet, trace->packet_len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
+	if (cc < 0 || cc != trace->packet_len)
 	{
 		if (cc < 0)
 			ft_printf("traceroute: sendto: Network is unreachable\n");

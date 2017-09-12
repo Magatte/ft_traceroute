@@ -42,6 +42,7 @@ SRCSPROG1	=	\
 				srcs/set_flags_values.c														\
 				srcs/utils/check_os.c														\
 				srcs/utils/get_current_time_millis.c										\
+				srcs/utils/get_protocol.c													\
 				srcs/network/protocol/utils/sum.c											\
 				srcs/network/protocol/icmp_handler.c										\
 				srcs/network/protocol/icmp_open_connection.c								\

@@ -26,153 +26,17 @@
 # include <unistd.h>
 # include <netdb.h>
 
-/*
-** INTERNET PROTOCOL IP
-*/
-# define PROT_INTERNET_IPV4 AF_INET
-# define PROT_INTERNET_IPV6 AF_INET6
-
-/*
-** Fluxs types
-*/
-# define BINARY_SOCK_FLUX SOCK_STREAM
-# define INTERNAL_NETWORK_FLUX SOCK_RAW
-# define SMALL_NETWORK_FLUX SOCK_DGRAM
-
-# ifdef __linux__
-/*
-** ON linux OS INTERNAL_NETWORK
-*/
-#  define NETWORK_FLUX INTERNAL_NETWORK_FLUX
-# else
-/*
-** On other OS SMALL_NETWORK_FLUX
-*/
-#  define NETWORK_FLUX SMALL_NETWORK_FLUX
-# endif
-
-/*
-** SOCK PROTOCOL
-*/
-# define DEFAULT_PROTOCOL 0
-# define ICMP_PROTOCOL IPPROTO_ICMP
-
-/*
-** setsockopt options :
-*/
-# define EPROTONOSUPPORT 93
-# define EAFNOSUPPORT    97
-
-# define SOL_TCP 6
-# define SOL_IP 0
-
-# define TCP_KEEPCNT 5
-# define TCP_KEEPIDLE 5
-# define TCP_KEEPINTVL 1
-
-/*
-** unsigned typedef
-*/
-typedef	unsigned char		u_char;
-typedef	unsigned short		u_short;
-typedef	unsigned int		u_int;
-typedef	unsigned long		u_long;
-
-
-#ifdef __unix__
-	#if BYTE_ORDER == BIG_ENDIAN
-		#define htons(n) (n)
-	#else
-		#define htons(n) (((((unsigned short)(n) & 0xFF)) << 8) | (((unsigned short)(n) & 0xFF00) >> 8))
-	#endif
-#endif
-
-/*
-** ICMP message HEADER
-*/
-struct icmphdr
+typedef enum                e_proto_enum
 {
-	u_char					type;		/* message type		*/
-	u_char					code;		/* type sub-code	*/
-	u_short					checksum;	/* sum of msglength	*/
-	union
-	{
-		struct
-		{
-			u_short			id;			/* current processid*/
-			u_short			sequence;	/* sequence id		*/
-		}					echo;		/* echo datagram	*/
-		unsigned int		gateway;	/* gateway address	*/
-	}						un;			/* union			*/
-};
+    IP,
+    ICMP,
+    UDP,
+    TCP,
+    GRE,
+    MAX_PROTO
+}                           t_proto_enum;
 
-struct iphdr
-{
-# if BYTE_ORDER == LITTLE_ENDIAN
-	u_char  hl:4,			/* header length */
-			version:4;		/* version */
-# endif
-# if BYTE_ORDER == BIG_ENDIAN
-	u_char  version:4,		/* version */
-			hl:4;			/* header length */
-# endif
-	u_char  service;		/* type of service */
-	u_short len;			/* total length */
-	u_short pid;			/* identification */
-	u_short off;			/* fragment offset field */
-# define	IP_DF 0x4000	/* dont fragment flag */
-# define	IP_MF 0x2000	/* more fragments flag */
-	u_char  ttl;			/* time to live */
-	u_char  protocol;		/* protocol */
-	u_short checksum;		/* checksum */
-	struct in_addr src;		/* source and dest address */
-	struct in_addr dest;	/* source and dest address */
-};
-
-/*
-** ICMP MESSAGE TYPES
-*/
-# define ICMP_ECHOREPLY		0	/* Echo Reply			    */
-# define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
-# define ICMP_SOURCE_QUENCH	4	/* Source Quench			*/
-# define ICMP_REDIRECT		5	/* Redirect (change route)	*/
-# define ICMP_ECHO			8	/* Echo Request				*/
-# define ICMP_TIME_EXCEEDED	11	/* Time Exceeded			*/
-# define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
-# define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
-# define ICMP_TIMESTAMPREPLY 14	/* Timestamp Reply			*/
-# define ICMP_INFO_REQUEST	15	/* Information Request		*/
-# define ICMP_INFO_REPLY	16	/* Information Reply		*/
-# define ICMP_ADDRESS		17	/* Address Mask Request		*/
-# define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
-# define NR_ICMP_TYPES		18
-
-# define ICMP_MINLEN		28
-
-/*
-** Changes the default value set by the TCP/IP service provider in the
-** TTL field of the IP header in outgoing datagrams.
-** IP_TTL support is not required;
-** to check whether IP_TTL is supported,
-** use getsockopt to get current options.
-** If getsockopt fails, IP_TTL is not supported.
-*/
-# define TCP_IP_PACKET_HEADER_SERVICE IP_TTL
-
-/*
-** icmp packet struct
-*/
-# define ICMP_HEADER_SIZE	sizeof(struct icmphdr)
-# define IPHDR_SIZE 		sizeof(struct iphdr)
-# define PACKET_X64 		(60 - ICMP_HEADER_SIZE)
-
-typedef struct				s_packet
-{
-# ifdef __linux__
-	struct iphdr			ip;
-# endif
-	struct icmphdr			header;				/* header of message send 	*/
-}							t_packet;
+# define MAX_PROTOCOLS MAX_PROTO
 
 /*
 ** Flags
@@ -187,6 +51,16 @@ typedef struct				s_flag
 	int						type;		/* type of value				*/
 	char					*error;		/* error message				*/
 }							t_flag;
+
+struct protocole
+{
+    t_proto_enum            e_name;
+	char					*name;
+    size_t                  len;
+    int                     proto;
+    void                    (*prepare)();
+	void					(*update_checksum)();
+};
 
 /*
 ** trace struct
@@ -215,15 +89,20 @@ typedef struct				s_trace
 	long					totaltime;	/* medium time					*/
 	int						maxtime;	/* maxtime						*/
 	struct in_addr			**ip_tab;
+	const struct protocole	*protocol;
+	int						packet_len;
 }							t_trace;
 
-# define FLAGS_SIZE			5
+# include "proto.h"
+
+# define FLAGS_SIZE			6
 
 # define F_MAXHOPS			trace->flags[0]->actif
 # define F_FIRSTHOPS		trace->flags[1]->actif
 # define F_PRINT_HOP_ADDR	trace->flags[2]->actif
 # define F_SOCK_DEBUG		trace->flags[3]->actif
 # define F_DONTROUTE		trace->flags[4]->actif
+# define F_PROTOCOL			trace->flags[5]->actif
 
 # define NB_TEST_CONNECTION	3
 
@@ -247,10 +126,6 @@ BOOLEAN						sendto_message(t_trace *trace);
 /*
 ** Messages
 */
-# ifdef __linux__
-void						prepare_iphdr(t_packet *packet, t_trace *trace);
-# endif
-void						prepare_icmp_header(t_packet *packet, t_trace *trace);
 void						*prepare_packet_to_send(t_trace *trace, size_t size);
 void						destruct_packet_send(t_packet *packet);
 
@@ -269,5 +144,7 @@ char						*get_hostname_ipv4(struct in_addr *addr);
 char						*get_hostname_ipv6(struct in6_addr *addr);
 struct sockaddr_in			*get_sockaddr_in_ipv4(char *host);
 char						*get_hostname_by_in_addr(const struct in_addr *addr);
+const struct protocole    	*get_protocol(t_proto_enum e);
+const struct protocole    	*get_protocol_by_name(char *name);
 
 #endif
