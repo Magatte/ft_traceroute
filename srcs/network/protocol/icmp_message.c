@@ -88,8 +88,8 @@ void		update_udp_checksum(t_packet *packet, t_trace *trace,\
 {
 	ft_memcpy(final_packet + iphdr_size, &packet->udp_header, trace->protocol->len);
 	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
-	packet->udp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
-	ft_memcpy(final_packet + iphdr_size, &packet->udp_header, trace->protocol->len);
+	//packet->udp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
+	//ft_memcpy(final_packet + iphdr_size, &packet->udp_header, trace->protocol->len);
 }
 
 void		update_tcp_checksum(t_packet *packet, t_trace *trace,\
