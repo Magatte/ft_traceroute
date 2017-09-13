@@ -203,6 +203,6 @@ BOOLEAN			load_flag_list(t_trace *trace)
 	trace->flags[2] = newflag(&(t_flag){false, "n", false, NULL, NULL, 0, NULL});
 	trace->flags[3] = newflag(&(t_flag){false, "d", false, NULL, NULL, 0, NULL});
 	trace->flags[4] = newflag(&(t_flag){false, "r", false, NULL, NULL, 0, NULL});
-	trace->flags[5] = newflag(&(t_flag){false, "P", true, "[-P protocol]", NULL, 0, "invalid protocol: `%s' (icmp, udp, tcp, gre)."});
+	trace->flags[5] = newflag(&(t_flag){false, "P", true, "[-P protocol]", NULL, 0, "Cannot handle `protocol' keyword with arg `%s' (icmp, udp, tcp, gre)\n"});
 	return (true);
 }

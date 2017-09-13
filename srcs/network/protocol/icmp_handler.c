@@ -12,6 +12,14 @@
 
 #include "ft_trace.h"
 
+void				icmp_check_code(t_trace *trace)
+{
+	struct icmphdr *hdr;
+
+	hdr = (struct icmphdr*)trace->packet;
+	ft_printf("(code: %d) (type: %d)", hdr->code, hdr->type);
+}
+
 /*
 ** read le message icmp header-packet
 */
@@ -24,8 +32,11 @@ struct in_addr		*icmp_handle_message(t_trace *trace)
 
 	if ((ret = recvfrom(trace->sock, &in, MSG_OOB, trace->sweepminsize, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
+		icmp_check_code(trace);
 		return (icmp_process_received_packet(trace, &from));
 	}
+	icmp_check_code(trace);
+	//trace->packet
 	return (NULL);
 }
 
@@ -55,6 +66,7 @@ struct in_addr		*icmp_process_received_packet(t_trace *trace, struct sockaddr_in
 	BOOLEAN			printhost;
 	char			*ndd;
 
+	
 	if (!(ip_addr = (struct in_addr*)malloc(sizeof(struct in_addr))))
 		return (NULL);
 	ip_addr->s_addr = addr->sin_addr.s_addr;

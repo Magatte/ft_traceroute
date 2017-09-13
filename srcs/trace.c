@@ -28,7 +28,7 @@ t_trace		*singleton_trace(void)
 	trace->received = 0;
 	trace->send = 0;
 	trace->timeout.tv_sec = 5;
-	trace->pid = getpid() & 0xFFFF;
+	trace->pid = (getpid() & 0xFFFF) | 0x8000;
 	trace->ttl = 1;
 	trace->sweepincrsize = 0;
 	trace->sweepminsize = PACKET_X64;
@@ -92,22 +92,19 @@ void		free_trace_tab(t_trace *trace)
 BOOLEAN		sendto_message(t_trace *trace)
 {
 	int		cc;
-	void	*packet;
 
 	trace->send++;
-	packet = prepare_packet_to_send(trace, trace->sweepminsize);
+	trace->packet = prepare_packet_to_send(trace, trace->sweepminsize);
 	trace->start_time = get_current_time_millis();
 	trace->packet_len += trace->sweepminsize;
-	cc = sendto(trace->sock, packet, trace->packet_len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
+	cc = sendto(trace->sock, trace->packet, trace->packet_len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
 	if (cc < 0 || cc != trace->packet_len)
 	{
 		if (cc < 0)
 			ft_printf("traceroute: sendto: Network is unreachable\n");
 		ft_printf("traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->sweepminsize, cc);
-		free(packet);
 		return (false);
 	}
-	free(packet);
 	return (true);
 }
 
@@ -133,6 +130,7 @@ BOOLEAN		process_three_request(t_trace *trace)
 		} else {
 			ft_printf(" *");
 		}
+		free(trace->packet);
 		free(trace->destip);
 		trace->destip = ft_strdup(tmp);
 		trace->sequence++;

@@ -91,6 +91,7 @@ typedef struct				s_trace
 	struct in_addr			**ip_tab;
 	const struct protocole	*protocol;
 	int						packet_len;
+	void					*packet;
 }							t_trace;
 
 # include "proto.h"

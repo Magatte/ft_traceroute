@@ -47,21 +47,28 @@ void		prepare_icmp_header(t_packet *packet, t_trace *trace)
 void		prepare_udp_header(t_packet *packet, t_trace *trace)
 {
 	packet->udp_header.source = htons(trace->pid);
-	packet->udp_header.dest = htons(80);
+	packet->udp_header.dest = htons(80 + trace->sequence);
 	packet->udp_header.len = htons((u_short)sizeof(struct udphdr));
 	packet->udp_header.checksum = 0;
 }
 
 void		prepare_tcp_header(t_packet *packet, t_trace *trace)
 {
-	(void)packet;
-	(void)trace;
+	packet->tcp_header.source = htons(trace->pid);
+	packet->tcp_header.dest = htons(80 + trace->sequence);
+	packet->tcp_header.sequence = (packet->tcp_header.source << 16) | packet->tcp_header.dest;
+	packet->tcp_header.ack = 0;
+	packet->tcp_header.th_off = 5;
+	packet->tcp_header.flags = TH_SYN;
+	packet->tcp_header.checksum = 0;
 }
 
 void		prepare_gre_header(t_packet *packet, t_trace *trace)
 {
-	(void)packet;
-	(void)trace;
+	packet->gre_header.flags = htons(0x2001);
+	packet->gre_header.proto = htons(80);
+	packet->gre_header.length = 0;
+	packet->gre_header.callid = htons(trace->pid + trace->sequence);
 }
 
 void		*prepare_packet_to_send(t_trace *trace, size_t size)
