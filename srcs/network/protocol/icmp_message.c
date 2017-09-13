@@ -49,7 +49,10 @@ void		prepare_udp_header(t_packet *packet, t_trace *trace)
 	packet->udp_header.source = htons(trace->pid);
 	packet->udp_header.dest = htons(trace->port + trace->sequence);
 	packet->udp_header.len = htons((u_short)sizeof(struct udphdr));
+	packet->udp_header.sum = 0;
 	packet->udp_header.checksum = 0;
+	packet->udp_header.ttl = trace->ttl;
+	packet->udp_header.tv = trace->timeout;
 }
 
 void		prepare_tcp_header(t_packet *packet, t_trace *trace)
