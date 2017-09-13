@@ -81,6 +81,23 @@
 # define ICMP_ADDRESS		17	/* Address Mask Request		*/
 # define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
 # define NR_ICMP_TYPES		18
+/* UNREACH codes */
+# define ICMP_UNREACH_NET	            0	/* bad net */
+# define ICMP_UNREACH_HOST	            1	/* bad host */
+# define ICMP_UNREACH_PROTOCOL	        2	/* bad protocol */
+# define ICMP_UNREACH_PORT	            3	/* bad port */
+# define ICMP_UNREACH_NEEDFRAG	        4	/* IP_DF caused drop */
+# define ICMP_UNREACH_SRCFAIL	        5	/* src route failed */
+# define ICMP_UNREACH_NET_UNKNOWN       6	/* unknown net */
+# define ICMP_UNREACH_HOST_UNKNOWN      7	/* unknown host */
+# define ICMP_UNREACH_ISOLATED	        8	/* src host isolated */
+# define ICMP_UNREACH_NET_PROHIB	    9	/* net denied */
+# define ICMP_UNREACH_HOST_PROHIB       10	/* host denied */
+# define ICMP_UNREACH_TOSNET	        11	/* bad tos for net */
+# define ICMP_UNREACH_TOSHOST	        12	/* bad tos for host */
+# define ICMP_UNREACH_FILTER_PROHIB     13	/* admin prohib */
+# define ICMP_UNREACH_HOST_PRECEDENCE   14	/* host prec vio. */
+# define ICMP_UNREACH_PRECEDENCE_CUTOFF 15	/* prec cutoff */
 
 # define ICMP_MINLEN		28
 
@@ -163,16 +180,16 @@ struct tcphdr {
 #define	TH_ACK              0x10
 #define	TH_URG              0x20
 	u_short                 win;			/* window */
-	u_short                 checksum;			/* checksum */
+	u_short                 checksum;		/* checksum */
 	u_short	                urp;			/* urgent pointer */
 };
 
 struct grehdr
 {
-    u_short                 flags;      /* 0x2001           */
-    u_short                 proto;      /* dest port        */
-    u_short                 length;     /*                  */
-    u_short                 callid;     /* pid + sequenceId */
+    u_short                 flags;          /* 0x2001           */
+    u_short                 proto;          /* dest port        */
+    u_short                 length;         /*                  */
+    u_short                 callid;         /* pid + sequenceId */
 };
 
 struct iphdr
@@ -194,8 +211,8 @@ struct iphdr
 	u_char                  ttl;			/* time to live */
 	u_char                  protocol;		/* protocol */
 	u_short                 checksum;		/* checksum */
-	struct in_addr          src;		/* source and dest address */
-	struct in_addr          dest;	/* source and dest address */
+	struct in_addr          src;		    /* source and dest address */
+	struct in_addr          dest;	        /* source and dest address */
 };
 
 /*

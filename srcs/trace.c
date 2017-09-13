@@ -37,7 +37,7 @@ t_trace		*singleton_trace(void)
 	trace->totaltime = 0;
 	trace->maxtime = 0;
 	trace->max_hop = 30;
-	trace->protocol = get_protocol(UDP);
+	trace->protocol = get_protocol(ICMP);
 	trace->packet_len = 0;
 	trace->retry = true;
 	if (!(trace->ip_tab = (struct in_addr**)malloc(sizeof(struct in_addr*) * NB_TEST_CONNECTION)))
