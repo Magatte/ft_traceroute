@@ -36,6 +36,8 @@ int	main(int argc, char **argv)
 		}
 		else
 		{
+			if (trace->shost == NULL)
+				trace->shost = ft_strdup("");
 			ft_fprintf(1, "ft_traceroute: cannot resolve %s: Unknow host\n", trace->shost);
 		}
 		destruct_trace(trace);

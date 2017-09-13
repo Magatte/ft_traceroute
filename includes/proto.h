@@ -220,8 +220,11 @@ struct iphdr
 */
 # define ICMP_HEADER_SIZE	sizeof(struct icmphdr)
 # define IPHDR_SIZE 		sizeof(struct iphdr)
-# define PACKET_X64 		(60 - ICMP_HEADER_SIZE)
-
+# ifdef __linux__
+#  define PACKET_X64 		60
+# else
+#  define PACKET_X64 		(60 - ICMP_HEADER_SIZE)
+# endif
 typedef struct				s_packet
 {
 # ifdef __linux__

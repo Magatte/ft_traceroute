@@ -198,11 +198,13 @@ BOOLEAN			load_flag_list(t_trace *trace)
 {
 	if (!(trace->flags = malloc(sizeof(t_flag) * FLAGS_SIZE)))
 		return (false);
-	trace->flags[0] = newflag(&(t_flag){false, "m", true, "[-m max_ttl]", NULL, 1, "invalid TTL: `%s'"});
+	trace->flags[0] = newflag(&(t_flag){false, "m", true, "[-m max_ttl]", NULL, 1, "max hops cannot be more than 255"});
 	trace->flags[1] = newflag(&(t_flag){false, "M", true, "[-M first_ttl]", NULL, 1, "ft_traceroute: first ttl (%d) may not be greater than max ttl (%d)\n"});
 	trace->flags[2] = newflag(&(t_flag){false, "n", false, NULL, NULL, 0, NULL});
 	trace->flags[3] = newflag(&(t_flag){false, "d", false, NULL, NULL, 0, NULL});
 	trace->flags[4] = newflag(&(t_flag){false, "r", false, NULL, NULL, 0, NULL});
 	trace->flags[5] = newflag(&(t_flag){false, "P", true, "[-P protocol]", NULL, 0, "Cannot handle `protocol' keyword with arg `%s' (icmp, udp, tcp, gre)\n"});
+	trace->flags[6] = newflag(&(t_flag){false, "p", true, "[-p port]", NULL, 1, "ft_traceroute: invalid port: `%d' (0-32768)\n"});
+	trace->flags[7] = newflag(&(t_flag){false, "h", false, NULL, NULL, 0, NULL});
 	return (true);
 }

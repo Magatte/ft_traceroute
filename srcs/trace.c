@@ -23,7 +23,7 @@ t_trace		*singleton_trace(void)
 	trace->sequence = 0;
 	trace->shost = NULL;
 	trace->destip = NULL;
-	trace->port = -1;
+	trace->port = 80;
 	trace->launch = process_traceroute;
 	trace->received = 0;
 	trace->send = 0;
@@ -102,8 +102,8 @@ BOOLEAN		sendto_message(t_trace *trace)
 	if (cc < 0 || cc != trace->packet_len)
 	{
 		if (cc < 0)
-			ft_printf("traceroute: sendto: Network is unreachable\n");
-		ft_printf("traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->sweepminsize, cc);
+			ft_printf("ft_traceroute: sendto: Network is unreachable\n");
+		ft_printf("ft_traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->sweepminsize, cc);
 		return (false);
 	}
 	return (true);
@@ -146,7 +146,7 @@ BOOLEAN		process_three_request(t_trace *trace)
 
 BOOLEAN		process_traceroute(t_trace *trace)
 {
-	printf("traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
+	printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_trace_tab(trace);

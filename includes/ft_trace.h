@@ -97,7 +97,7 @@ typedef struct				s_trace
 
 # include "proto.h"
 
-# define FLAGS_SIZE			6
+# define FLAGS_SIZE			8
 
 # define F_MAXHOPS			trace->flags[0]->actif
 # define F_FIRSTHOPS		trace->flags[1]->actif
@@ -105,6 +105,7 @@ typedef struct				s_trace
 # define F_SOCK_DEBUG		trace->flags[3]->actif
 # define F_DONTROUTE		trace->flags[4]->actif
 # define F_PROTOCOL			trace->flags[5]->actif
+# define F_PORT				trace->flags[6]->actif
 
 # define NB_TEST_CONNECTION	3
 
