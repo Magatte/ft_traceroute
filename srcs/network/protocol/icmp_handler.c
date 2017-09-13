@@ -12,6 +12,20 @@
 
 #include "ft_trace.h"
 
+void				check_packet(t_trace *trace, void *packet, int ret)
+{
+	struct icmphdr *hdr;
+
+	if (trace->protocol->e_name != ICMP)
+		return ;
+# ifdef __linux__
+	hdr = (struct icmphdr*)(packet + IPHDR_SIZE);
+# else
+	hdr = (struct icmphdr*)(packet);
+# endif
+	ft_printf("(code:%d), (type:%d), (ret:%d)", hdr->code, hdr->type, ret);
+}
+
 /*
 ** read le message icmp header-packet
 */
@@ -25,6 +39,7 @@ struct in_addr		*icmp_handle_message(t_trace *trace)
 	//MSG_OOB
 	if ((ret = recvfrom(trace->sock, &packet, trace->packet_len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
+		check_packet(trace, packet, ret);
 		return (icmp_process_received_packet(trace, &from));
 	}
 	return (NULL);

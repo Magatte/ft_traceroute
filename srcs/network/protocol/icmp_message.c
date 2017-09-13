@@ -71,6 +71,40 @@ void		prepare_gre_header(t_packet *packet, t_trace *trace)
 	packet->gre_header.callid = htons(trace->pid + trace->sequence);
 }
 
+void		update_icmp_checksum(t_packet *packet, t_trace *trace,\
+			void *final_packet, size_t iphdr_size, size_t size)
+{
+	ft_memcpy(final_packet + iphdr_size, &packet->icmp_header, trace->protocol->len);
+	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
+	packet->icmp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
+	ft_memcpy(final_packet + iphdr_size, &packet->icmp_header, trace->protocol->len);
+}
+
+void		update_udp_checksum(t_packet *packet, t_trace *trace,\
+			void *final_packet, size_t iphdr_size, size_t size)
+{
+	ft_memcpy(final_packet + iphdr_size, &packet->udp_header, trace->protocol->len);
+	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
+	packet->udp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
+	ft_memcpy(final_packet + iphdr_size, &packet->udp_header, trace->protocol->len);
+}
+
+void		update_tcp_checksum(t_packet *packet, t_trace *trace,\
+			void *final_packet, size_t iphdr_size, size_t size)
+{
+	ft_memcpy(final_packet + iphdr_size, &packet->tcp_header, trace->protocol->len);
+	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
+	packet->tcp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
+	ft_memcpy(final_packet + iphdr_size, &packet->tcp_header, trace->protocol->len);
+}
+
+void		update_gre_checksum(t_packet *packet, t_trace *trace,\
+			void *final_packet, size_t iphdr_size, size_t size)
+{
+	ft_memcpy(final_packet + iphdr_size, &packet->gre_header, trace->protocol->len);
+	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
+}
+
 void		*prepare_packet_to_send(t_trace *trace, size_t size)
 {
 	t_packet 	*packet;
@@ -97,42 +131,8 @@ void		*prepare_packet_to_send(t_trace *trace, size_t size)
 	return (final_packet);
 }
 
-void					update_icmp_checksum(t_packet *packet, t_trace *trace,\
-						void *final_packet, size_t iphdr_size, size_t size)
-{
-	ft_memcpy(final_packet + iphdr_size, &packet->icmp_header, trace->protocol->len);
-	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
-	packet->icmp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
-	ft_memcpy(final_packet + iphdr_size, &packet->icmp_header, trace->protocol->len);
-}
 
-void					update_udp_checksum(t_packet *packet, t_trace *trace,\
-						void *final_packet, size_t iphdr_size, size_t size)
-{
-	ft_memcpy(final_packet + iphdr_size, &packet->udp_header, trace->protocol->len);
-	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
-	packet->udp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
-	ft_memcpy(final_packet + iphdr_size, &packet->udp_header, trace->protocol->len);
-}
-
-void					update_tcp_checksum(t_packet *packet, t_trace *trace,\
-						void *final_packet, size_t iphdr_size, size_t size)
-{
-	ft_memcpy(final_packet + iphdr_size, &packet->tcp_header, trace->protocol->len);
-	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
-	packet->tcp_header.checksum = checksum(final_packet + iphdr_size, trace->protocol->len + size);
-	ft_memcpy(final_packet + iphdr_size, &packet->tcp_header, trace->protocol->len);
-}
-
-void					update_gre_checksum(t_packet *packet, t_trace *trace,\
-						void *final_packet, size_t iphdr_size, size_t size)
-{
-	ft_memcpy(final_packet + iphdr_size, &packet->gre_header, trace->protocol->len);
-	ft_memset(final_packet + iphdr_size + trace->protocol->len, '0', size);
-}
-
-
-void					destruct_packet_send(t_packet *packet)
+void			destruct_packet_send(t_packet *packet)
 {
 	free(packet);
 }
