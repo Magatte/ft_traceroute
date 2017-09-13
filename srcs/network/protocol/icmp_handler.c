@@ -14,9 +14,13 @@
 
 void				icmp_check_code(t_trace *trace)
 {
-	struct icmphdr *hdr;
-
+	struct icmphdr	*hdr;
+	//int				code;
+# ifdef __linux__
+	hdr = (struct icmphdr*)trace->packet + IPHDR_SIZE;
+# else
 	hdr = (struct icmphdr*)trace->packet;
+# endif
 	ft_printf("(code: %d) (type: %d)", hdr->code, hdr->type);
 }
 

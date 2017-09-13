@@ -39,6 +39,7 @@ t_trace		*singleton_trace(void)
 	trace->max_hop = 30;
 	trace->protocol = get_protocol(UDP);
 	trace->packet_len = 0;
+	trace->retry = true;
 	if (!(trace->ip_tab = (struct in_addr**)malloc(sizeof(struct in_addr*) * NB_TEST_CONNECTION)))
 		return (NULL);
 	ft_bzero(&trace->addr, sizeof(trace->addr));
@@ -146,7 +147,7 @@ BOOLEAN		process_three_request(t_trace *trace)
 BOOLEAN		process_traceroute(t_trace *trace)
 {
 	printf("traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
-	while (trace->ttl <= trace->max_hop)
+	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_trace_tab(trace);
 		ft_printf("%2d ", trace->ttl);

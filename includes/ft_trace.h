@@ -92,6 +92,7 @@ typedef struct				s_trace
 	const struct protocole	*protocol;
 	int						packet_len;
 	void					*packet;
+	BOOLEAN					retry;
 }							t_trace;
 
 # include "proto.h"
