@@ -162,17 +162,17 @@ struct udphdr
 struct tcphdr {
 	u_short                 source;		    /* source port */
 	u_short                 dest;		    /* destination port */
-	u_long                  sequence;		/* sequence number */
-	u_long                  ack;			/* acknowledgement number */
+	u_int                   sequence;		/* sequence number */
+	u_int                   ack;			/* acknowledgement number */
 #if BYTE_ORDER == LITTLE_ENDIAN 
-	u_char                  th_x2:4,		/* (unused) */
+	u_short                 th_x2:4,		/* (unused) */
 		                    th_off:4;		/* data offset */
 #endif
 #if BYTE_ORDER == BIG_ENDIAN 
-	u_char	                th_off:4,		/* data offset */
+	u_short	                th_off:4,		/* data offset */
 		                    th_x2:4;		/* (unused) */
 #endif
-	u_char	                flags;          /* options of type msg */
+	u_short	                flags;          /* options of type msg */
 #define	TH_FIN              0x01
 #define	TH_SYN              0x02
 #define	TH_RST              0x04
