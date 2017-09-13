@@ -116,6 +116,7 @@ BOOLEAN						load_flags(t_trace *trace, int argc, char **argv);
 BOOLEAN						load_flag_list(t_trace *trace);
 BOOLEAN						icmp_initialize_connection(t_trace *trace, int ttl);
 BOOLEAN						set_flags_values(t_trace *trace);
+BOOLEAN						print_help(t_trace *trace);
 
 /*
 ** trace.c

@@ -21,19 +21,19 @@ static BOOLEAN		print_error(char *error)
 
 static BOOLEAN		print_error_args(char *error, int args)
 {
-	printf(error, args);
+	ft_fprintf(1, error, args);
 	return (false);
 }
 
 static BOOLEAN		print_error_args_string(char *error, char *args)
 {
-	printf(error, args);
+	ft_fprintf(1, error, args);
 	return (false);
 }
 
 static BOOLEAN		print_error_two_args(char *error, int arg, int arg2)
 {
-	printf(error, arg, arg2);
+	ft_fprintf(1, error, arg, arg2);
 	return (false);
 }
 

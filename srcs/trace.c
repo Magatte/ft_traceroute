@@ -102,8 +102,8 @@ BOOLEAN		sendto_message(t_trace *trace)
 	if (cc < 0 || cc != trace->packet_len)
 	{
 		if (cc < 0)
-			ft_printf("ft_traceroute: sendto: Network is unreachable\n");
-		ft_printf("ft_traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->sweepminsize, cc);
+			ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
+		ft_printf("ft_traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->packet_len, cc);
 		return (false);
 	}
 	return (true);
@@ -123,8 +123,10 @@ BOOLEAN		process_three_request(t_trace *trace)
 	{
 		//Open socket connection
 		icmp_initialize_connection(trace, trace->ttl);
-		if (sendto_message(trace) != false\
-			&& (trace->ip_tab[i] = icmp_handle_message(trace)) != NULL) {
+		sendto_message(trace);
+		if (i == 0)
+			ft_printf("%2d ", trace->ttl);
+		if ((trace->ip_tab[i] = icmp_handle_message(trace)) != NULL) {
 			responses++;
 			if (ft_strcmp(get_hostname_ipv4(trace->ip_tab[i]), tmp) == 0)
 				retry = false;
@@ -150,7 +152,6 @@ BOOLEAN		process_traceroute(t_trace *trace)
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_trace_tab(trace);
-		ft_printf("%2d ", trace->ttl);
 		if (process_three_request(trace) == false) {
 			free_trace_tab(trace);
 			break ;

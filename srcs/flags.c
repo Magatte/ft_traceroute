@@ -65,7 +65,7 @@ BOOLEAN			print_help(t_trace *trace)
 			printf(" %s", trace->flags[i]->help);
 		i++;
 	}
-	printf("\n");
+	printf(" host [packetlen]\n");
 	return (false);
 }
 
@@ -132,6 +132,32 @@ BOOLEAN			select_value_special_flags(t_trace *trace,\
 	return (false);
 }
 
+BOOLEAN			load_size(t_trace *trace, char *arg)
+{
+	int size;
+
+	if (arg[0] == '-')
+		return (false);
+	if (!ft_is_string_numeric(arg))
+	{
+		ft_fprintf(1, "traceroute: \"%s\" bad value for packet length", arg);
+		exit(0);
+	}
+	size = ft_atoi(arg);
+	if (size < trace->sweepminsize)
+	{
+		ft_fprintf(1, "ft_traceroute: packet length must be > %d\n", trace->sweepminsize);
+		exit(0);
+	}
+	if (size > 32768)
+	{
+		ft_fprintf(1, "ft_traceroute: packet length must be <= 32768\n");
+		exit(0);
+	}
+	trace->sweepminsize = size;
+	return (true);
+}
+
 BOOLEAN			load_host(t_trace *trace, char *arg)
 {
 	struct sockaddr_in *in;
@@ -145,8 +171,11 @@ BOOLEAN			load_host(t_trace *trace, char *arg)
 	}
 	trace->shost = ft_strdup(arg);
 	in = get_sockaddr_in_ipv4(trace->shost);
-	if (in == NULL)
+	if (in == NULL) {
+		ft_strdel(&trace->shost);
+		trace->shost = NULL;
 		return (false);
+	}
 	trace->addr = *in;
 	trace->destip = ft_strdup(get_hostname_ipv4(&trace->addr.sin_addr));
 	return (true);
@@ -168,7 +197,10 @@ BOOLEAN			load_flags(t_trace *trace, int argc, char **argv)
 	}
 	while (i < argc)
 	{
-		load_host(trace, argv[i]);
+		if (trace->shost != NULL)
+			load_size(trace, argv[i]);
+		else
+			load_host(trace, argv[i]);
 		activ_flags(trace, argv[i]);
 		if (select_value_special_flags(trace, i, argv[i], argv, argc)) {
 			i++;
