@@ -22,7 +22,7 @@ struct in_addr		*icmp_handle_message(t_trace *trace)
 	struct sockaddr_in from;
 	socklen_t fromlen = sizeof(from);
 
-	if ((ret = recvfrom(trace->sock, &in, MSG_OOB, trace->sweepminsize, (struct sockaddr*)&from, &fromlen)) != 0)
+	if ((ret = recvfrom(trace->sock, &in, MSG_OOB, trace->sweepminsize, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
 		return (icmp_process_received_packet(trace, &from));
 	}
