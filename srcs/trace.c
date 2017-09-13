@@ -97,7 +97,6 @@ BOOLEAN		sendto_message(t_trace *trace)
 	trace->send++;
 	trace->packet = prepare_packet_to_send(trace, trace->sweepminsize);
 	trace->start_time = get_current_time_millis();
-	trace->packet_len += trace->sweepminsize;
 	cc = sendto(trace->sock, trace->packet, trace->packet_len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
 	if (cc < 0 || cc != trace->packet_len)
 	{

@@ -152,8 +152,8 @@ struct udphdr
     u_short                 source;     /* source processid */
     u_short                 dest;       /* dest port        */
     u_short                 len;        /* udp header size  */
-    u_short                 sum;        /* sum of msglength */
-    u_char                  checksum;
+    u_short                 checksum;   /* sum of msglength */
+    u_char                  sec;
     u_char                  ttl;
     struct timeval          tv;
 };

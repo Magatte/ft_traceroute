@@ -48,9 +48,9 @@ void		prepare_udp_header(t_packet *packet, t_trace *trace)
 {
 	packet->udp_header.source = htons(trace->pid);
 	packet->udp_header.dest = htons(trace->port + trace->sequence);
-	packet->udp_header.len = htons((u_short)sizeof(struct udphdr));
-	packet->udp_header.sum = 0;
+	packet->udp_header.len = htons((u_short)(trace->packet_len - sizeof(struct iphdr)));
 	packet->udp_header.checksum = 0;
+	packet->udp_header.sec = trace->sequence;
 	packet->udp_header.ttl = trace->ttl;
 	packet->udp_header.tv = trace->timeout;
 }
@@ -122,6 +122,7 @@ void		*prepare_packet_to_send(t_trace *trace, size_t size)
 	iphdr_size = IPHDR_SIZE;
 	prepare_iphdr(packet, trace);
 #endif
+	trace->packet_len = trace->protocol->len + iphdr_size + trace->sweepminsize;
 	trace->protocol->prepare(packet, trace);
 
 	final_packet = ft_strnew(iphdr_size + trace->protocol->len + size);
@@ -130,7 +131,6 @@ void		*prepare_packet_to_send(t_trace *trace, size_t size)
 #endif
 	trace->protocol->update_checksum(packet, trace, final_packet, iphdr_size, size);
 	destruct_packet_send(packet);
-	trace->packet_len = trace->protocol->len + iphdr_size;
 	return (final_packet);
 }
 
