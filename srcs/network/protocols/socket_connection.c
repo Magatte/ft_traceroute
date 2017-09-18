@@ -23,7 +23,7 @@
 */
 BOOLEAN			initialize_socket_connection(t_trace *trace)
 {
-	trace->sock = socket(PROT_INTERNET_IPV4, NETWORK_FLUX, ICMP_PROTOCOL);//trace->protocol->proto);
+	trace->sock = socket(PROT_INTERNET_IPV4, NETWORK_FLUX, trace->protocol->proto);
 	if (!socket_connection_is_estabilised(trace->sock))
 		return (false);
 	if (!bind_socket(trace))

@@ -24,7 +24,7 @@ void		prepare_iphdr(t_message *message, t_trace *trace)
 	}
 
 	message->ip_header.ttl = trace->ttl;
-	message->ip_header.protocol = IPPROTO_ICMP;
+	message->ip_header.protocol = trace->protocol->proto;
 	message->ip_header.version = 4;//ipv4
 	message->ip_header.hl = sizeof(struct iphdr) >> 2;
 	message->ip_header.pid = htons(trace->pid);
