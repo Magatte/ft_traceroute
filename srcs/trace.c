@@ -38,11 +38,10 @@ t_trace		*singleton_trace(void)
 	trace->maxtime = 0;
 	trace->max_hop = 30;
 	trace->protocol = get_protocol(ICMP);
-	trace->packet_len = 0;
 	trace->retry = true;
-	if (!(trace->ip_tab = (struct in_addr**)malloc(sizeof(struct in_addr*) * NB_TEST_CONNECTION)))
+	trace->ping_interval = DEFAULT_PING_INTERVAL;
+	if (!load_ip_tab(trace))
 		return (NULL);
-	ft_bzero(&trace->addr, sizeof(trace->addr));
 	return (trace);
 }
 
@@ -66,43 +65,19 @@ void		destruct_trace(t_trace *trace)
 	free(trace);
 }
 
-void		reset_trace_tab(t_trace *trace)
-{
-	int i;
-
-	i = 0;
-	while (i < NB_TEST_CONNECTION)
-	{
-		trace->ip_tab[i++] = NULL;
-	}
-}
-
-void		free_trace_tab(t_trace *trace)
-{
-	int i;
-
-	i = 0;
-	while (i < NB_TEST_CONNECTION)
-	{
-		if (trace->ip_tab[i] != NULL)
-			free(trace->ip_tab[i]);
-		i++;
-	}
-}
-
 BOOLEAN		sendto_message(t_trace *trace)
 {
 	int		cc;
 
 	trace->send++;
-	trace->packet = prepare_packet_to_send(trace, trace->sweepminsize);
+	new_message(trace, trace->sweepminsize);
 	trace->start_time = get_current_time_millis();
-	cc = sendto(trace->sock, trace->packet, trace->packet_len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
-	if (cc < 0 || cc != trace->packet_len)
+	cc = sendto(trace->sock, trace->message->data, trace->message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
+	if (cc < 0 || cc != trace->message->len)
 	{
 		if (cc < 0)
 			ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
-		ft_printf("ft_traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->packet_len, cc);
+		ft_printf("ft_traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->message->len, cc);
 		return (false);
 	}
 	return (true);
@@ -121,7 +96,7 @@ BOOLEAN		process_three_request(t_trace *trace)
 	while (i < NB_TEST_CONNECTION)
 	{
 		//Open socket connection
-		icmp_initialize_connection(trace, trace->ttl);
+		initialize_socket_connection(trace);
 		sendto_message(trace);
 		if (i == 0)
 			ft_printf("%2d ", trace->ttl);
@@ -132,7 +107,8 @@ BOOLEAN		process_three_request(t_trace *trace)
 		} else {
 			ft_printf(" *");
 		}
-		free(trace->packet);
+		free(trace->message->data);
+		free(trace->message);
 		free(trace->destip);
 		trace->destip = ft_strdup(tmp);
 		trace->sequence++;
@@ -150,12 +126,12 @@ BOOLEAN		process_traceroute(t_trace *trace)
 	printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
-		reset_trace_tab(trace);
+		reset_ip_tab(trace);
 		if (process_three_request(trace) == false) {
-			free_trace_tab(trace);
+			free_ip_tab(trace);
 			break ;
 		}
-		free_trace_tab(trace);
+		free_ip_tab(trace);
 		trace->ttl++;
 	}
 	return (true);

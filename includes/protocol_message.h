@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   proto.h                                            :+:      :+:    :+:   */
+/*   protocol_message.h                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jguyet <jguyet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PROTO_H
-# define PROTO_H
+#ifndef PROTOCOL_MESSAGE_H
+# define PROTOCOL_MESSAGE_H
 
 /*
 ** INTERNET PROTOCOL IP
@@ -219,7 +219,7 @@ struct iphdr
 };
 
 /*
-** icmp packet struct
+** icmp message struct
 */
 # define ICMP_HEADER_SIZE	sizeof(struct icmphdr)
 # define IPHDR_SIZE 		sizeof(struct iphdr)
@@ -228,83 +228,18 @@ struct iphdr
 # else
 #  define PACKET_X64 		(60 - ICMP_HEADER_SIZE)
 # endif
-typedef struct				s_packet
+typedef struct				s_message
 {
 # ifdef __linux__
-	struct iphdr			ip;
+	struct iphdr			ip_header;
 # endif
 	struct icmphdr			icmp_header;				/* header of message send 	*/
     struct udphdr           udp_header;
     struct tcphdr           tcp_header;
     struct grehdr           gre_header;
-}							t_packet;
-
-/*
-** prepare functions
-*/
-# ifdef __linux__
-void		                prepare_iphdr(t_packet *packet, t_trace *trace);
-# endif
-void                        prepare_icmp_header(t_packet *packet, t_trace *trace);
-void		                prepare_udp_header(t_packet *packet, t_trace *trace);
-void		                prepare_tcp_header(t_packet *packet, t_trace *trace);
-void		                prepare_gre_header(t_packet *packet, t_trace *trace);
-
-void					    update_icmp_checksum(t_packet *packet, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
-void					    update_udp_checksum(t_packet *packet, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
-void					    update_tcp_checksum(t_packet *packet, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
-void					    update_gre_checksum(t_packet *packet, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
-
-static const struct protocole protos[MAX_PROTOCOLS] = {
-    {
-        IP,
-        "ip",
-        sizeof(struct iphdr),
-        DEFAULT_PROTOCOL,
-# ifdef __linux__
-        prepare_iphdr,
-# else
-        NULL,
-# endif
-        NULL
-
-    },
-    {
-        ICMP,
-        "icmp",
-        sizeof(struct icmphdr),
-        ICMP_PROTOCOL,
-        prepare_icmp_header,
-        update_icmp_checksum
-    },
-    {
-        UDP,
-        "udp",
-        sizeof(struct udphdr),
-        UDP_PROTOCOL,
-        prepare_udp_header,
-        update_udp_checksum
-    },
-    {
-        TCP,
-        "tcp",
-        sizeof(struct tcphdr),
-        TCP_PROTOCOL,
-        prepare_tcp_header,
-        update_tcp_checksum
-    },
-    {
-        GRE,
-        "gre",
-        sizeof(struct grehdr),
-        GRE_PROTOCOL,
-        prepare_gre_header,
-        update_gre_checksum
-    }
-};
+    void                    *data;
+    int                     len;
+    int                     packet_len;
+}							t_message;
 
 #endif

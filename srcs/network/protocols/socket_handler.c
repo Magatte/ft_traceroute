@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   icmp_handler.c                                     :+:      :+:    :+:   */
+/*   socket_handler.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jguyet <jguyet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -37,34 +37,15 @@ struct in_addr		*icmp_handle_message(t_trace *trace)
 	socklen_t fromlen = sizeof(from);
 
 	//MSG_OOB
-	if ((ret = recvfrom(trace->sock, &packet, trace->packet_len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
+	if ((ret = recvfrom(trace->sock, &packet, trace->message->len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
 		//check_packet(trace, packet, ret);
-		return (icmp_process_received_packet(trace, &from));
+		return (process_received_message(trace, &from));
 	}
 	return (NULL);
 }
 
-BOOLEAN				trace_tab_exists(t_trace *trace, struct in_addr *addr)
-{
-	int i;
-
-	i = 0;
-	while (i < NB_TEST_CONNECTION)
-	{
-		if (trace->ip_tab[i] == NULL)
-		{
-			i++;
-			continue;
-		}
-		if (ft_strcmp(get_hostname_ipv4(addr), get_hostname_ipv4(trace->ip_tab[i])) == 0)
-			return (true);
-		i++;
-	}
-	return (false);
-}
-
-struct in_addr		*icmp_process_received_packet(t_trace *trace, struct sockaddr_in *addr)
+struct in_addr		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
 {
 	int				time_of;
 	struct in_addr	*ip_addr;
@@ -76,7 +57,7 @@ struct in_addr		*icmp_process_received_packet(t_trace *trace, struct sockaddr_in
 		return (NULL);
 	ip_addr->s_addr = addr->sin_addr.s_addr;
 	time_of = (get_current_time_millis() - trace->start_time);
-	printhost = trace_tab_exists(trace, &addr->sin_addr);
+	printhost = ip_tab_contains(trace, &addr->sin_addr);
 
 	if (printhost == false)
 	{

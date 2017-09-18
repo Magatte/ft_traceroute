@@ -43,10 +43,16 @@ SRCSPROG1	=	\
 				srcs/utils/check_os.c														\
 				srcs/utils/get_current_time_millis.c										\
 				srcs/utils/get_protocol.c													\
+				srcs/utils/array_ip_tab.c													\
 				srcs/network/protocols/utils/sum.c											\
-				srcs/network/protocols/icmp_handler.c										\
-				srcs/network/protocols/icmp_open_connection.c								\
-				srcs/network/protocols/icmp_message.c
+				srcs/network/protocols/socket_handler.c										\
+				srcs/network/protocols/socket_connection.c									\
+				srcs/network/protocols/protocol_message.c									\
+				srcs/network/protocols/headers/ip_protocol_header.c							\
+				srcs/network/protocols/headers/icmp_protocol_header.c						\
+				srcs/network/protocols/headers/tcp_protocol_header.c						\
+				srcs/network/protocols/headers/udp_protocol_header.c						\
+				srcs/network/protocols/headers/gre_protocol_header.c						\
 
 DSRCSPROG1	=	$(addprefix $(SRCDIR), $(SRCSPROG1))
 

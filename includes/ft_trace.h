@@ -26,6 +26,8 @@
 # include <unistd.h>
 # include <netdb.h>
 
+# include "protocol_message.h"
+
 typedef enum                e_proto_enum
 {
     IP,
@@ -90,12 +92,12 @@ typedef struct				s_trace
 	int						maxtime;	/* maxtime						*/
 	struct in_addr			**ip_tab;
 	const struct protocole	*protocol;
-	int						packet_len;
-	void					*packet;
+	t_message				*message;
+	int						ping_interval;
 	BOOLEAN					retry;
 }							t_trace;
 
-# include "proto.h"
+# define DEFAULT_PING_INTERVAL 3
 
 # define FLAGS_SIZE			8
 
@@ -110,11 +112,22 @@ typedef struct				s_trace
 # define NB_TEST_CONNECTION	3
 
 /*
+** Socket connection
+*/
+BOOLEAN						initialize_socket_connection(t_trace *trace);
+# ifdef CONNECTION_FILE
+BOOLEAN						bind_socket(t_trace *trace);
+BOOLEAN						set_on_socket_options(t_trace *trace);
+BOOLEAN						socket_connection_is_estabilised(int fd);
+BOOLEAN						bind_error(void);
+BOOLEAN						set_socket_options_error(void);
+# endif
+
+/*
 ** flags manager
 */
 BOOLEAN						load_flags(t_trace *trace, int argc, char **argv);
 BOOLEAN						load_flag_list(t_trace *trace);
-BOOLEAN						icmp_initialize_connection(t_trace *trace, int ttl);
 BOOLEAN						set_flags_values(t_trace *trace);
 BOOLEAN						print_help(t_trace *trace);
 
@@ -130,14 +143,14 @@ BOOLEAN						sendto_message(t_trace *trace);
 /*
 ** Messages
 */
-void						*prepare_packet_to_send(t_trace *trace, size_t size);
-void						destruct_packet_send(t_packet *packet);
+void						*new_message(t_trace *trace, size_t size);
+void						destruct_message(t_message *packet);
 
 /*
 ** Handler
 */
 struct in_addr				*icmp_handle_message(t_trace *trace);
-struct in_addr				*icmp_process_received_packet(t_trace *trace, struct sockaddr_in *addr);
+struct in_addr				*process_received_message(t_trace *trace, struct sockaddr_in *addr);
 
 /*
 ** Utils
@@ -150,5 +163,81 @@ struct sockaddr_in			*get_sockaddr_in_ipv4(char *host);
 char						*get_hostname_by_in_addr(const struct in_addr *addr);
 const struct protocole    	*get_protocol(t_proto_enum e);
 const struct protocole    	*get_protocol_by_name(char *name);
+
+/*
+** Array ip tab
+*/
+BOOLEAN						ip_tab_contains(t_trace *trace, struct in_addr *addr);
+void						reset_ip_tab(t_trace *trace);
+void						free_ip_tab(t_trace *trace);
+BOOLEAN						load_ip_tab(t_trace *trace);
+
+/*
+** prococol headers
+*/
+# ifdef __linux__
+void		                prepare_iphdr(t_message *message, t_trace *trace);
+# endif
+void                        prepare_icmp_header(t_message *message, t_trace *trace);
+void		                prepare_udp_header(t_message *message, t_trace *trace);
+void		                prepare_tcp_header(t_message *message, t_trace *trace);
+void		                prepare_gre_header(t_message *message, t_trace *trace);
+
+void					    update_icmp_checksum(t_message *message, t_trace *trace,\
+						    void *final_packet, size_t iphdr_size, size_t size);
+void					    update_udp_checksum(t_message *message, t_trace *trace,\
+						    void *final_packet, size_t iphdr_size, size_t size);
+void					    update_tcp_checksum(t_message *message, t_trace *trace,\
+						    void *final_packet, size_t iphdr_size, size_t size);
+void					    update_gre_checksum(t_message *message, t_trace *trace,\
+						    void *final_packet, size_t iphdr_size, size_t size);
+
+static const struct protocole protos[MAX_PROTOCOLS] = {
+    {
+        IP,
+        "ip",
+        sizeof(struct iphdr),
+        DEFAULT_PROTOCOL,
+# ifdef __linux__
+        prepare_iphdr,
+# else
+        NULL,
+# endif
+        NULL
+
+    },
+    {
+        ICMP,
+        "icmp",
+        sizeof(struct icmphdr),
+        ICMP_PROTOCOL,
+        prepare_icmp_header,
+        update_icmp_checksum
+    },
+    {
+        UDP,
+        "udp",
+        sizeof(struct udphdr),
+        UDP_PROTOCOL,
+        prepare_udp_header,
+        update_udp_checksum
+    },
+    {
+        TCP,
+        "tcp",
+        sizeof(struct tcphdr),
+        TCP_PROTOCOL,
+        prepare_tcp_header,
+        update_tcp_checksum
+    },
+    {
+        GRE,
+        "gre",
+        sizeof(struct grehdr),
+        GRE_PROTOCOL,
+        prepare_gre_header,
+        update_gre_checksum
+    }
+};
 
 #endif
