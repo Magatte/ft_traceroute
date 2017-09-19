@@ -81,8 +81,8 @@ void		update_tcp_checksum(t_message *message, t_trace *trace,\
 	message->pseudoheader.protocol = message->ip_header.protocol;
 	message->pseudoheader.tcplen = htons(sizeof(struct tcphdr));
 
-	ft_memcpy(tcpcsumblock, &message->pseudoheader, sizeof(struct tcphdr));
-  	ft_memcpy(tcpcsumblock + sizeof(struct tcphdr), &message->tcp_header, sizeof(struct tcphdr));
+	ft_memcpy(tcpcsumblock, &message->pseudoheader, sizeof(struct pseudoheader));
+  	ft_memcpy(tcpcsumblock + sizeof(struct pseudoheader), &message->tcp_header, sizeof(struct tcphdr));
 
 	message->tcp_header.checksum = checksum(tcpcsumblock,  sizeof(tcpcsumblock));
 
