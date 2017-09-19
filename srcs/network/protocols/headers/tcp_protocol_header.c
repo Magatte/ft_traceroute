@@ -72,7 +72,7 @@ void		update_tcp_checksum(t_message *message, t_trace *trace,\
 	ft_memcpy(ptr_message + iphdr_size, &message->tcp_header, trace->protocol->len);
 	ft_memset(ptr_message + iphdr_size + trace->protocol->len, '0', size);
 	message->tcp_header.checksum = tcp_checksum(trace->protocol->len, message->ip_header.src.s_addr,\
-		message->ip_header.dst.s_addr, &message->tcp_header);//checksum(trace->protocol->len, trace->protocol->len + size);
+		message->ip_header.dest.s_addr, &message->tcp_header);//checksum(trace->protocol->len, trace->protocol->len + size);
 	ft_memcpy(ptr_message + iphdr_size, &message->tcp_header, trace->protocol->len);
 # endif
 }
