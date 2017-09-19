@@ -129,6 +129,7 @@ BOOLEAN		process_loop(t_trace *trace)
 BOOLEAN		process_traceroute(t_trace *trace)
 {
 	printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
+	printf("My pid = %d\n", htons(trace->pid));
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_ip_tab(trace);

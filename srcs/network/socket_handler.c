@@ -35,7 +35,7 @@ t_message			*parse_packet(t_trace *trace, void *packet, int ret)
 # ifdef __linux__
 	ft_memcpy(&message->ip_header, packet, IPHDR_SIZE);
 	packet += IPHDR_SIZE;
-	ft_printf("\niphdr:\n\nttl: %d\n", message->ip_header.ttl);
+	ft_printf("\niphdr:\n\n(tos 0x0, ttl %d, id 56660, offset 0, flags [none], proto ICMP (1), length 88)\n", message->ip_header.ttl);
 # endif
 	if (trace->protocol->e_name == ICMP)
 	{
