@@ -73,7 +73,7 @@ void		update_tcp_checksum(t_message *message, t_trace *trace,\
 	//ft_memset(ptr_message + iphdr_size + trace->protocol->len, '0', size);
 
 		 /* TCP Pseudoheader + TCP actual header used for computing the checksum */
-  	char tcpcsumblock[ sizeof(struct pseudoheader) + TCPSYN_LEN];
+  	char tcpcsumblock[ sizeof(struct pseudoheader) + sizeof(struct tcphdr)];
 
 	message->pseudoheader.src = message->ip_header.src.s_addr;
 	message->pseudoheader.dst = message->ip_header.dest.s_addr;
