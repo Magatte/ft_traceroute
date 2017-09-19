@@ -33,14 +33,15 @@ t_message			*parse_packet(t_trace *trace, void *packet, int ret)
 	message = new_message(trace->sweepminsize);
 
 # ifdef __linux__
-	ft_memcpy(packet, &message->ip_header, IPHDR_SIZE);
+	ft_memcpy(&message->ip_header, packet, IPHDR_SIZE);
 	packet += IPHDR_SIZE;
+	ft_printf("\niphdr:\n\nttl: %d\n", message->ip_header.ttl);
 # endif
 	if (trace->protocol->e_name == ICMP)
 	{
 		//struct icmphdr *hdr = (struct icmphdr*)packet;
 		ft_memcpy(&message->icmp_header, packet, trace->protocol->len);
-		ft_printf("\n (id:%d), (seq:%d), (ret:%d)\n", message->icmp_header.un.echo.id, message->icmp_header.un.echo.sequence, ret);
+		ft_printf("\n (id:%d), (seq:%d), (ret:%d)\n\n", message->icmp_header.un.echo.id, message->icmp_header.un.echo.sequence, ret);
 	}
 	return (message);
 }
