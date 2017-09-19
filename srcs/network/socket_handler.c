@@ -31,18 +31,23 @@ t_message			*parse_packet(t_trace *trace, void *packet, int ret)
 	t_message *message;
 
 	message = new_message(trace->sweepminsize);
-
+	(void)packet;
+	(void)ret;
 # ifdef __linux__
 	ft_memcpy(&message->ip_header, packet, IPHDR_SIZE);
 	packet += IPHDR_SIZE;
-	ft_printf("\niphdr:\n\n(tos 0x0, ttl %d, id 56660, offset 0, flags [none], proto ICMP (1), length 88)\n", message->ip_header.ttl);
-# endif
 	if (trace->protocol->e_name == ICMP)
 	{
 		//struct icmphdr *hdr = (struct icmphdr*)packet;
 		ft_memcpy(&message->icmp_header, packet, trace->protocol->len);
-		ft_printf("\n (id:%d), (seq:%d), (ret:%d)\n\n", message->icmp_header.un.echo.id, message->icmp_header.un.echo.sequence, ret);
+		ft_printf("\nreceiv:\n\n(ttl %d, id %d, seq %d, proto ICMP (1), length %d)\n",\
+			message->ip_header.ttl,\
+			ntohs(message->icmp_header.un.echo.id),
+			ntohs(message->icmp_header.un.echo.sequence),
+			ret
+			);
 	}
+# endif
 	return (message);
 }
 
