@@ -12,30 +12,42 @@
 
 #include "ft_trace.h"
 
-void		*new_message(t_trace *trace, size_t size)
+t_message	*new_message(size_t size)
 {
-	size_t		iphdr_size;
+	t_message	*message;
 
-	if (!(trace->message = (t_message*)malloc(sizeof(t_message))))
-			return (NULL);
-	iphdr_size = 0;
-	ft_bzero(trace->message, sizeof(t_message));
-#ifdef __linux__
-	iphdr_size = IPHDR_SIZE;
-	prepare_iphdr(trace->message, trace);
-#endif
-	trace->message->len = trace->protocol->len + iphdr_size + trace->sweepminsize;
-	trace->protocol->prepare(trace->message, trace);
-
-	trace->message->data = ft_strnew(iphdr_size + trace->protocol->len + size);
-#ifdef __linux__
-	ft_memcpy(trace->message->data, &trace->message->ip_header, IPHDR_SIZE);
-#endif
-	trace->protocol->update_checksum(trace->message, trace, trace->message->data, iphdr_size, size);
-	//destruct_packet_send(message);
-	return (trace->message->data);
+	if (!(message = (t_message*)malloc(sizeof(t_message))))
+		return (NULL);
+	ft_bzero(message, sizeof(t_message));
+	message->packet_len = size;
+	message->serialize = serialize_message;
+	return (message);
 }
 
+BOOLEAN		serialize_message(t_message *message, t_trace *trace)
+{
+#ifdef __linux__
+	size_t		iphdr_size = IPHDR_SIZE;
+#else
+	size_t		iphdr_size = 0;
+#endif
+#ifdef __linux__
+	//prepare ip header
+	prepare_iphdr(message, trace);
+#endif
+	//set message total length
+	message->len = trace->protocol->len + iphdr_size + message->packet_len;
+	//prepare protocol header
+	trace->protocol->prepare_header(message, trace);
+	//serialize message
+	if (!(message->data = ft_strnew(iphdr_size + trace->protocol->len + message->packet_len)))
+		return (false);
+#ifdef __linux__
+	ft_memcpy(message->data, &message->ip_header, IPHDR_SIZE);
+#endif
+	trace->protocol->serialize(message, trace, message->data, iphdr_size, message->packet_len);
+	return (true);
+}
 
 void			destruct_message(t_message *message)
 {

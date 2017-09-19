@@ -240,6 +240,7 @@ typedef struct				s_message
     void                    *data;
     int                     len;
     int                     packet_len;
+    BOOLEAN                 (*serialize)();
 }							t_message;
 
 #endif

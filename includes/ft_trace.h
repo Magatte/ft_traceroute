@@ -60,8 +60,8 @@ struct protocole
 	char					*name;
     size_t                  len;
     int                     proto;
-    void                    (*prepare)();
-	void					(*update_checksum)();
+    void                    (*prepare_header)();
+	void					(*serialize)();
 };
 
 /*
@@ -143,7 +143,8 @@ BOOLEAN						sendto_message(t_trace *trace);
 /*
 ** Messages
 */
-void						*new_message(t_trace *trace, size_t size);
+t_message					*new_message(size_t size);
+BOOLEAN						serialize_message(t_message *message, t_trace *trace);
 void						destruct_message(t_message *packet);
 
 /*

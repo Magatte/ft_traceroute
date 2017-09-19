@@ -65,60 +65,65 @@ void		destruct_trace(t_trace *trace)
 	free(trace);
 }
 
-BOOLEAN		sendto_message(t_trace *trace)
+BOOLEAN		send_message(t_trace *trace, t_message *message)
 {
-	int		cc;
+	int		res;
 
 	trace->send++;
-	new_message(trace, trace->sweepminsize);
+	//trace->message = new_message(trace->sweepminsize);
+	//trace->message->serialize(trace->message, trace);
 	trace->start_time = get_current_time_millis();
-	cc = sendto(trace->sock, trace->message->data, trace->message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
-	if (cc < 0 || cc != trace->message->len)
+	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
+	if (res < 0)
 	{
-		if (cc < 0)
-			ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
-		ft_printf("ft_traceroute: wrote %s %d chars, ret=%d\n", trace->shost, trace->message->len, cc);
+		ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
+		return (false);
+	}
+	if (res != message->len)
+	{
+		ft_printf("ft_traceroute: wrote %s %d chars, ret=%d\n", trace->shost, message->len, res);
 		return (false);
 	}
 	return (true);
 }
 
-BOOLEAN		process_three_request(t_trace *trace)
+BOOLEAN		process_loop(t_trace *trace)
 {
-	BOOLEAN retry = true;
 	int i;
-	int responses;
-	char *tmp;
+	char *save_addr;
 
 	i = 0;
-	responses = 0;
-	tmp = ft_strdup(trace->destip);
+	save_addr = ft_strdup(trace->destip);
 	while (i < NB_TEST_CONNECTION)
 	{
 		//Open socket connection
 		initialize_socket_connection(trace);
-		sendto_message(trace);
-		if (i == 0)
-			ft_printf("%2d ", trace->ttl);
-		if ((trace->ip_tab[i] = icmp_handle_message(trace)) != NULL) {
-			responses++;
-			if (ft_strcmp(get_hostname_ipv4(trace->ip_tab[i]), tmp) == 0)
-				retry = false;
-		} else {
+
+		trace->message = new_message(trace->sweepminsize);
+		trace->message->serialize(trace->message, trace);
+
+		send_message(trace, trace->message);
+		if ((trace->ip_tab[i] = icmp_handle_message(trace)) != NULL)
+		{
+			if (ft_strcmp(get_hostname_ipv4(trace->ip_tab[i]), save_addr) == 0)
+				trace->retry = false;
+		}
+		else
+		{
 			ft_printf(" *");
 		}
 		free(trace->message->data);
 		free(trace->message);
 		free(trace->destip);
-		trace->destip = ft_strdup(tmp);
+		trace->destip = ft_strdup(save_addr);
 		trace->sequence++;
 		//close socket connection
 		close(trace->sock);
 		i++;
 	}
-	ft_strdel(&tmp);
+	ft_strdel(&save_addr);
 	ft_printf("\n");
-	return (retry);
+	return (trace->retry);
 }
 
 BOOLEAN		process_traceroute(t_trace *trace)
@@ -127,7 +132,7 @@ BOOLEAN		process_traceroute(t_trace *trace)
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_ip_tab(trace);
-		if (process_three_request(trace) == false) {
+		if (process_loop(trace) == false) {
 			free_ip_tab(trace);
 			break ;
 		}

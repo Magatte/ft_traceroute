@@ -26,6 +26,25 @@ void				check_packet(t_trace *trace, void *packet, int ret)
 	ft_printf("(code:%d), (type:%d), (ret:%d)", hdr->code, hdr->type, ret);
 }
 
+t_message			*parse_packet(t_trace *trace, void *packet, int ret)
+{
+	t_message *message;
+
+	message = new_message(trace->sweepminsize);
+
+# ifdef __linux__
+	ft_memcpy(packet, &message->ip_header, IPHDR_SIZE);
+	packet += IPHDR_SIZE;
+# endif
+	if (trace->protocol->e_name == ICMP)
+	{
+		//struct icmphdr *hdr = (struct icmphdr*)packet;
+		ft_memcpy(&message->icmp_header, packet, trace->protocol->len);
+		ft_printf("\n (id:%d), (seq:%d), (ret:%d)\n", message->icmp_header.un.echo.id, message->icmp_header.un.echo.sequence, ret);
+	}
+	return (message);
+}
+
 /*
 ** read le message icmp header-packet
 */
@@ -36,9 +55,12 @@ struct in_addr		*icmp_handle_message(t_trace *trace)
 	struct sockaddr_in from;
 	socklen_t fromlen = sizeof(from);
 
+	if (trace->ip_tab[0] == NULL)
+		ft_printf("%2d ", trace->ttl);
 	//MSG_OOB
 	if ((ret = recvfrom(trace->sock, &packet, trace->message->len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
+		parse_packet(trace, packet, ret);
 		//check_packet(trace, packet, ret);
 		return (process_received_message(trace, &from));
 	}
