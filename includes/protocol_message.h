@@ -248,6 +248,7 @@ typedef struct				s_message
 	struct icmphdr			icmp_header;				/* header of message send 	*/
     struct udphdr           udp_header;
     struct tcphdr           tcp_header;
+	struct pseudoheader		pseudoheader;
     struct grehdr           gre_header;
     void                    *data;
     int                     len;
