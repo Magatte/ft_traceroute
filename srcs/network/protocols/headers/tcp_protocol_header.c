@@ -70,10 +70,10 @@ void		update_tcp_checksum(t_message *message, t_trace *trace,\
 	(void)size;
 # ifdef __linux__
 	ft_memcpy(ptr_message + iphdr_size, &message->tcp_header, trace->protocol->len);
-	ft_memset(ptr_message + iphdr_size + trace->protocol->len, '0', size);
+	//ft_memset(ptr_message + iphdr_size + trace->protocol->len, '0', size);
 
 		 /* TCP Pseudoheader + TCP actual header used for computing the checksum */
-  	char tcpcsumblock[ sizeof(struct tcphdr) + size];
+  	char tcpcsumblock[ sizeof(struct pseudoheader) + TCPSYN_LEN];
 
 	message->pseudoheader.src = message->ip_header.src.s_addr;
 	message->pseudoheader.dst = message->ip_header.dest.s_addr;
