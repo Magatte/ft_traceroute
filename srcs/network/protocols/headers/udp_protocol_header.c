@@ -12,6 +12,8 @@
 
 #include "ft_trace.h"
 
+#include <sys/time.h>
+
 void		prepare_udp_header(t_message *message, t_trace *trace)
 {
 	message->udp_header.source = htons(trace->pid);
@@ -20,7 +22,7 @@ void		prepare_udp_header(t_message *message, t_trace *trace)
 	message->udp_header.checksum = 0;
 	message->udp_header.sec = trace->sequence;
 	message->udp_header.ttl = trace->ttl;
-	message->udp_header.tv = trace->timeout;
+	gettimeofday(&message->udp_header.tv, 0);
 }
 
 void		update_udp_checksum(t_message *message, t_trace *trace, size_t iphdr_size)
