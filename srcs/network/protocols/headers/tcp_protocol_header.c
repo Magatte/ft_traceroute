@@ -12,52 +12,52 @@
 
 #include "ft_trace.h"
 
+#define TCPSYN_LEN 20
+
+/* This piece of code has been used many times in a lot of differents tools. */
+/* I haven't been able to determine the author of the code but it looks like */
+/* this is a public domain implementation of the checksum algorithm */
+unsigned short in_cksum(unsigned short *addr,int len){
+    
+register int sum = 0;
+u_short answer = 0;
+register u_short *w = addr;
+register int nleft = len;
+    
+/*
+* Our algorithm is simple, using a 32-bit accumulator (sum),
+* we add sequential 16-bit words to it, and at the end, fold back 
+* all the carry bits from the top 16 bits into the lower 16 bits. 
+*/
+    
+while (nleft > 1) {
+sum += *w++;
+nleft -= 2;
+}
+
+/* mop up an odd byte, if necessary */
+if (nleft == 1) {
+*(u_char *)(&answer) = *(u_char *)w ;
+sum += answer;
+}
+
+/* add back carry outs from top 16 bits to low 16 bits */
+sum = (sum >> 16) + (sum &0xffff); /* add hi 16 to low 16 */
+sum += (sum >> 16); /* add carry */
+answer = ~sum; /* truncate to 16 bits */
+return(answer);
+
+} /* End of in_cksum() */
+
 void		prepare_tcp_header(t_message *message, t_trace *trace)
 {
 	message->tcp_header.source = htons(trace->pid);
 	message->tcp_header.dest = htons(trace->port + trace->sequence);
-	message->tcp_header.sequence = (message->tcp_header.source << 16) | message->tcp_header.dest;
-	message->tcp_header.ack = 0;
+	message->tcp_header.sequence = trace->sequence;
+	message->tcp_header.ack = htonl(1);
 	message->tcp_header.th_off = 5;
 	message->tcp_header.flags = TH_SYN;
 	message->tcp_header.checksum = 0;
-}
-
-uint16_t	tcp_checksum(unsigned short len_tcp,
-						     uint32_t saddr,
-						     uint32_t daddr,
-						     struct tcphdr *tcp_pkt)
-{
-	unsigned short *src_addr = (unsigned short *)&saddr;
-	unsigned short *dest_addr = (unsigned short *)&daddr;
-
-	unsigned char prot_tcp = 6;
-	unsigned long sum = 0;
-	int nleft = len_tcp;
-	unsigned short *w;
-
-	w = (unsigned short *)tcp_pkt;
-	// calculate the checksum for the tcp header and tcp data
-	while (nleft > 1) {
-		sum += *w++;
-		nleft -= 2;
-	}
-	// if nleft is 1 there ist still on byte left.
-	// We add a padding byte (0xFF) to build a 16bit word
-	if (nleft > 0) {
-		sum += *w & ntohs(0xFF00);
-	}
-	// add the pseudo header
-	sum += src_addr[0];
-	sum += src_addr[1];
-	sum += dest_addr[0];
-	sum += dest_addr[1];
-	sum += htons(len_tcp);
-	sum += htons(prot_tcp);
-	sum = (sum >> 16) + (sum & 0xFFFF);
-	sum += (sum >> 16);
-	// Take the one's complement of sum
-	return (unsigned short)(~sum);
 }
 
 void		update_tcp_checksum(t_message *message, t_trace *trace,\
@@ -71,8 +71,21 @@ void		update_tcp_checksum(t_message *message, t_trace *trace,\
 # ifdef __linux__
 	ft_memcpy(ptr_message + iphdr_size, &message->tcp_header, trace->protocol->len);
 	ft_memset(ptr_message + iphdr_size + trace->protocol->len, '0', size);
-	message->tcp_header.checksum = tcp_checksum(trace->protocol->len, message->ip_header.src.s_addr,\
-		message->ip_header.dest.s_addr, &message->tcp_header);//checksum(trace->protocol->len, trace->protocol->len + size);
+
+		 /* TCP Pseudoheader + TCP actual header used for computing the checksum */
+  	char tcpcsumblock[ sizeof(struct tcphdr) + size];
+
+	message->pseudoheader.src = message->ip_header.src.s_addr;
+	message->pseudoheader.dst = message->ip_header.dest.s_addr;
+	message->pseudoheader.zero = 0;
+	message->pseudoheader.protocol = message->ip_header.protocol;
+	message->pseudoheader.tcplen = htons(sizeof(struct tcphdr));
+
+	memcpy(tcpcsumblock, &message->pseudoheader, sizeof(struct tcphdr));
+  	memcpy(tcpcsumblock + sizeof(struct tcphdr), &message->tcp_header, sizeof(struct tcphdr));
+
+	message->tcp_header.checksum = checksum(tcpcsumblock,  sizeof(tcpcsumblock));
+
 	ft_memcpy(ptr_message + iphdr_size, &message->tcp_header, trace->protocol->len);
 # endif
 }

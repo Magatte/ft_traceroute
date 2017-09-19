@@ -128,6 +128,9 @@ typedef	unsigned long		u_long;
 	#endif
 #endif
 
+#define CKSUM(x) \
+    (x = (x >> 16) + (x & 0xffff), (~(x + (x >> 16)) & 0xffff))
+
 /*
 ** ICMP message HEADER
 */
@@ -157,6 +160,15 @@ struct udphdr
     u_char                  ttl;
     struct timeval          tv;
 };
+
+typedef struct pseudoheader
+{
+	u_int32_t src;
+	u_int32_t dst;
+	u_char zero;
+	u_char protocol;
+	u_int16_t tcplen;
+}				tcp_phdr_t;
 
 /*
  * TCP header.
