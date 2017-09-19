@@ -20,9 +20,8 @@ void		prepare_gre_header(t_message *message, t_trace *trace)
 	message->gre_header.callid = htons(trace->pid + trace->sequence);
 }
 
-void		update_gre_checksum(t_message *message, t_trace *trace,\
-			void *ptr_message, size_t iphdr_size, size_t size)
+void		update_gre_checksum(t_message *message, t_trace *trace, size_t iphdr_size)
 {
-	ft_memcpy(ptr_message + iphdr_size, &message->gre_header, trace->protocol->len);
-	ft_memset(ptr_message + iphdr_size + trace->protocol->len, '0', size);
+	ft_memcpy(message->data + iphdr_size, &message->gre_header, trace->protocol->len);
+	ft_memset(message->data + iphdr_size + trace->protocol->len, '0', message->packet_len);
 }

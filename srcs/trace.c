@@ -38,7 +38,12 @@ t_trace		*singleton_trace(void)
 	trace->maxtime = 0;
 	trace->max_hop = 30;
 	trace->protocol = get_protocol(ICMP);
+	trace->socket_type = INTERNAL_SOCK_FLUX;
 	trace->retry = true;
+	trace->use_ip_header = false;
+# ifdef __linux__
+	trace->use_ip_header = true;
+#endif
 	trace->ping_interval = DEFAULT_PING_INTERVAL;
 	if (!load_ip_tab(trace))
 		return (NULL);
@@ -129,7 +134,8 @@ BOOLEAN		process_loop(t_trace *trace)
 BOOLEAN		process_traceroute(t_trace *trace)
 {
 	printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
-	printf("My pid = %d\n", htons(trace->pid));
+	printf("My pid = htons %d\n", htons(trace->pid));
+	printf("My pid =       %d\n", trace->pid);
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_ip_tab(trace);

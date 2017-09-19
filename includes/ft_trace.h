@@ -95,11 +95,13 @@ typedef struct				s_trace
 	t_message				*message;
 	int						ping_interval;
 	BOOLEAN					retry;
+    BOOLEAN                 use_ip_header;
+    int                     socket_type;
 }							t_trace;
 
 # define DEFAULT_PING_INTERVAL 3
 
-# define FLAGS_SIZE			8
+# define FLAGS_SIZE			9
 
 # define F_MAXHOPS			trace->flags[0]->actif
 # define F_FIRSTHOPS		trace->flags[1]->actif
@@ -108,8 +110,10 @@ typedef struct				s_trace
 # define F_DONTROUTE		trace->flags[4]->actif
 # define F_PROTOCOL			trace->flags[5]->actif
 # define F_PORT				trace->flags[6]->actif
+# define F_DEFAULT			trace->flags[7]->actif
+# define F_IP_HDR			trace->flags[8]->actif
 
-# define NB_TEST_CONNECTION	3
+# define NB_TEST_CONNECTION	1
 
 /*
 ** Socket connection
@@ -176,22 +180,16 @@ BOOLEAN						load_ip_tab(t_trace *trace);
 /*
 ** prococol headers
 */
-# ifdef __linux__
 void		                prepare_iphdr(t_message *message, t_trace *trace);
-# endif
 void                        prepare_icmp_header(t_message *message, t_trace *trace);
 void		                prepare_udp_header(t_message *message, t_trace *trace);
 void		                prepare_tcp_header(t_message *message, t_trace *trace);
 void		                prepare_gre_header(t_message *message, t_trace *trace);
 
-void					    update_icmp_checksum(t_message *message, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
-void					    update_udp_checksum(t_message *message, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
-void					    update_tcp_checksum(t_message *message, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
-void					    update_gre_checksum(t_message *message, t_trace *trace,\
-						    void *final_packet, size_t iphdr_size, size_t size);
+void					    update_icmp_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
+void					    update_udp_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
+void					    update_tcp_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
+void					    update_gre_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
 
 static const struct protocole protos[MAX_PROTOCOLS] = {
     {
@@ -199,11 +197,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         "ip",
         sizeof(struct iphdr),
         DEFAULT_PROTOCOL,
-# ifdef __linux__
         prepare_iphdr,
-# else
-        NULL,
-# endif
         NULL
 
     },

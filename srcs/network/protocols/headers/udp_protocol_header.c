@@ -23,11 +23,10 @@ void		prepare_udp_header(t_message *message, t_trace *trace)
 	message->udp_header.tv = trace->timeout;
 }
 
-void		update_udp_checksum(t_message *message, t_trace *trace,\
-			void *ptr_message, size_t iphdr_size, size_t size)
+void		update_udp_checksum(t_message *message, t_trace *trace, size_t iphdr_size)
 {
-	ft_memcpy(ptr_message + iphdr_size, &message->udp_header, trace->protocol->len);
-	ft_memset(ptr_message + iphdr_size + trace->protocol->len, '0', size);
-	message->udp_header.checksum = checksum(ptr_message + iphdr_size, trace->protocol->len + size);
-	ft_memcpy(ptr_message + iphdr_size, &message->udp_header, trace->protocol->len);
+	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
+	ft_memset(message->data + iphdr_size + trace->protocol->len, '0', message->packet_len);
+	message->udp_header.checksum = checksum(message->data + iphdr_size, trace->protocol->len + message->packet_len);
+	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
 }

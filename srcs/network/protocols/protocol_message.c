@@ -26,15 +26,14 @@ t_message	*new_message(size_t size)
 
 BOOLEAN		serialize_message(t_message *message, t_trace *trace)
 {
-#ifdef __linux__
-	size_t		iphdr_size = IPHDR_SIZE;
-#else
 	size_t		iphdr_size = 0;
-#endif
-#ifdef __linux__
-	//prepare ip header
-	prepare_iphdr(message, trace);
-#endif
+
+	if (trace->use_ip_header)
+	{
+		iphdr_size = IPHDR_SIZE;
+		//prepare ip header
+		prepare_iphdr(message, trace);
+	}
 	//set message total length
 	message->len = trace->protocol->len + iphdr_size + message->packet_len;
 	//prepare protocol header
@@ -42,10 +41,11 @@ BOOLEAN		serialize_message(t_message *message, t_trace *trace)
 	//serialize message
 	if (!(message->data = ft_strnew(iphdr_size + trace->protocol->len + message->packet_len)))
 		return (false);
-#ifdef __linux__
-	ft_memcpy(message->data, &message->ip_header, IPHDR_SIZE);
-#endif
-	trace->protocol->serialize(message, trace, message->data, iphdr_size, message->packet_len);
+	if (trace->use_ip_header)
+	{
+		ft_memcpy(message->data, &message->ip_header, IPHDR_SIZE);
+	}
+	trace->protocol->serialize(message, trace, iphdr_size);
 	return (true);
 }
 

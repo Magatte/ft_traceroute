@@ -23,20 +23,8 @@
 ** Fluxs types
 */
 # define BINARY_SOCK_FLUX   SOCK_STREAM
-# define INTERNAL_NETWORK_FLUX SOCK_RAW
-# define SMALL_NETWORK_FLUX SOCK_DGRAM
-
-# ifdef __linux__
-/*
-** ON linux OS INTERNAL_NETWORK
-*/
-#  define NETWORK_FLUX      INTERNAL_NETWORK_FLUX
-# else
-/*
-** On other OS SMALL_NETWORK_FLUX
-*/
-#  define NETWORK_FLUX      SMALL_NETWORK_FLUX
-# endif
+# define INTERNAL_SOCK_FLUX SOCK_RAW
+# define SMALL_SOCK_FLUX	SOCK_DGRAM
 
 /*
 ** SOCK PROTOCOL
@@ -242,9 +230,9 @@ struct iphdr
 # endif
 typedef struct				s_message
 {
-# ifdef __linux__
+//# ifdef __linux__
 	struct iphdr			ip_header;
-# endif
+//# endif
 	struct icmphdr			icmp_header;				/* header of message send 	*/
     struct udphdr           udp_header;
     struct tcphdr           tcp_header;

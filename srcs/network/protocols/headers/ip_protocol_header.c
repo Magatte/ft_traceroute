@@ -12,7 +12,6 @@
 
 #include "ft_trace.h"
 
-#ifdef __linux__
 void		prepare_iphdr(t_message *message, t_trace *trace)
 {
 	message->ip_header.src.s_addr = INADDR_ANY;
@@ -34,4 +33,3 @@ void		prepare_iphdr(t_message *message, t_trace *trace)
 	message->ip_header.checksum = 0;
 	message->ip_header.checksum = checksum(&message->ip_header, sizeof(struct iphdr));
 }
-#endif

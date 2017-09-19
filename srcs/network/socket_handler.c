@@ -18,11 +18,14 @@ void				check_packet(t_trace *trace, void *packet, int ret)
 
 	if (trace->protocol->e_name != ICMP)
 		return ;
-# ifdef __linux__
-	hdr = (struct icmphdr*)(packet + IPHDR_SIZE);
-# else
-	hdr = (struct icmphdr*)(packet);
-# endif
+	if (trace->use_ip_header)
+	{
+		hdr = (struct icmphdr*)(packet + IPHDR_SIZE);
+	}
+	else
+	{
+		hdr = (struct icmphdr*)(packet);
+	}
 	ft_printf("(code:%d), (type:%d), (ret:%d)", hdr->code, hdr->type, ret);
 }
 
@@ -33,21 +36,18 @@ t_message			*parse_packet(t_trace *trace, void *packet, int ret)
 	message = new_message(trace->sweepminsize);
 	(void)packet;
 	(void)ret;
-# ifdef __linux__
-	ft_memcpy(&message->ip_header, packet, IPHDR_SIZE);
-	packet += IPHDR_SIZE;
-# endif
+	if (trace->use_ip_header)
+	{
+		ft_memcpy(&message->ip_header, packet, IPHDR_SIZE);
+		packet += IPHDR_SIZE;
+	}
 
 	if (trace->protocol->e_name == ICMP)
 	{
 		//struct icmphdr *hdr = (struct icmphdr*)packet;
 		ft_memcpy(&message->icmp_header, packet, trace->protocol->len);
 		ft_printf("\nreceiv:\n\n(ttl %d, id %d, seq %d, proto ICMP (1), length %d)\n",
-# ifdef __linux__
 			message->ip_header.ttl,
-# else
-			0,
-#endif
 			ntohs(message->icmp_header.un.echo.id),
 			ntohs(message->icmp_header.un.echo.sequence),
 			ret
@@ -71,7 +71,7 @@ struct in_addr		*icmp_handle_message(t_trace *trace)
 	//MSG_OOB
 	if ((ret = recvfrom(trace->sock, &packet, trace->message->len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
-		parse_packet(trace, packet, ret);
+		//parse_packet(trace, packet, ret);
 		//check_packet(trace, packet, ret);
 		return (process_received_message(trace, &from));
 	}

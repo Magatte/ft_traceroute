@@ -57,5 +57,7 @@ BOOLEAN				set_flags_values(t_trace *trace)
 		trace->port = ft_atoi(trace->flags[6]->value);
 	if (trace->port < 1 || trace->port > 32768)
 		return (print_error_args(trace->flags[6]->error, trace->port));
+	if (F_IP_HDR)
+		trace->use_ip_header = !trace->use_ip_header;
 	return (true);
 }

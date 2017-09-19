@@ -52,7 +52,7 @@ struct sockaddr_in *get_sockaddr_in_ipv4(char *host)
 
 	ft_memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PROT_INTERNET_IPV4;
-	hints.ai_socktype = NETWORK_FLUX;
+	hints.ai_socktype = SOCK_RAW;
 	if (getaddrinfo(host, NULL, &hints, &res) != 0)
 		return (NULL);
 	while (res)

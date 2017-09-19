@@ -106,7 +106,8 @@ BOOLEAN			select_value_special_flags(t_trace *trace,\
 		return (false);
 	while (i < FLAGS_SIZE)
 	{
-		if (trace->flags[i]->special == false\
+		if (trace->flags[i]->type == -1\
+			|| trace->flags[i]->special == false\
 			|| ft_strcmp(trace->flags[i]->name, arg + 1) != 0)
 		{
 			i++;
@@ -238,5 +239,6 @@ BOOLEAN			load_flag_list(t_trace *trace)
 	trace->flags[5] = newflag(&(t_flag){false, "P", true, "[-P protocol]", NULL, 0, "Cannot handle `protocol' keyword with arg `%s' (icmp, udp, tcp, gre)\n"});
 	trace->flags[6] = newflag(&(t_flag){false, "p", true, "[-p port]", NULL, 1, "ft_traceroute: invalid port: `%d' (0-32768)\n"});
 	trace->flags[7] = newflag(&(t_flag){false, "h", false, NULL, NULL, 0, NULL});
+	trace->flags[8] = newflag(&(t_flag){false, "iphdr", true, "[-iphdr]", NULL, -1, NULL});
 	return (true);
 }
