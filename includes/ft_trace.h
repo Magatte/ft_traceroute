@@ -214,7 +214,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         UDP,
         "udp",
         sizeof(struct udphdr),
-        ICMP_PROTOCOL,
+        UDP_PROTOCOL,
         prepare_udp_header,
         update_udp_checksum
     },
