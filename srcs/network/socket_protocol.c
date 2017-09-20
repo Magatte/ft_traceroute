@@ -35,13 +35,13 @@ BOOLEAN			initialize_socket_protocol_connection(t_trace *trace)
 BOOLEAN			set_on_socket_protocol_options(t_trace *trace)
 {
 	int opt;
-	//int ttl;
+	int ttl;
 
 	opt = 1;
-	/*ttl = trace->ttl;
+	ttl = trace->ttl;
 	if (setsockopt(trace->sock, 0, TCP_IP_PACKET_HEADER_SERVICE,\
 		&ttl, sizeof(ttl)) != 0)
-		return (false);*/
+		return (false);
 	if (trace->use_ip_header)
 	{
 		if ((setsockopt(trace->sock, IPPROTO_IP, IP_HDRINCL, &opt, sizeof(opt))) != 0)

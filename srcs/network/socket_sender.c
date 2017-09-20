@@ -16,7 +16,7 @@
 
 BOOLEAN			initialize_socket_sender_connection(t_trace *trace)
 {
-	trace->sock_snd = socket(PROT_INTERNET_IPV4, SOCK_RAW, IPPROTO_RAW);
+	trace->sock_snd = socket(PROT_INTERNET_IPV4, trace->socket_type, IPPROTO_RAW);
 	if (!socket_connection_is_estabilised(trace->sock_snd))
 	{
 		if (trace->sock_snd && trace->socket_type == SOCK_RAW)
@@ -25,6 +25,7 @@ BOOLEAN			initialize_socket_sender_connection(t_trace *trace)
 			printf("(Restart on SOCK_DGRAM socket type)\n");
 			return (initialize_socket_sender_connection(trace));
 		}
+        printf("LALALALLA\n");
 		return (false);
 	}
 	if (!bind_socket(trace))
@@ -51,16 +52,16 @@ BOOLEAN			bind_socket(t_trace *trace)
 BOOLEAN			set_on_socket_sender_options(t_trace *trace)
 {
 	int opt;
-	//int ttl;
+	int ttl;
 
 	opt = 1;
-	/*ttl = trace->ttl;
-	if (setsockopt(trace->sock, 0, TCP_IP_PACKET_HEADER_SERVICE,\
+	ttl = trace->ttl;
+	if (setsockopt(trace->sock_snd, 0, TCP_IP_PACKET_HEADER_SERVICE,\
 		&ttl, sizeof(ttl)) != 0)
-		return (false);*/
+		return (false);
 	if (trace->use_ip_header)
 	{
-		if ((setsockopt(trace->sock, IPPROTO_IP, IP_HDRINCL, &opt, sizeof(opt))) != 0)
+		if ((setsockopt(trace->sock_snd, IPPROTO_IP, IP_HDRINCL, &opt, sizeof(opt))) != 0)
 			return (false);
 		/*
 		** L'option  SO_BROADCAST  demande  l'autorisation de pouvoir
@@ -68,8 +69,8 @@ BOOLEAN			set_on_socket_sender_options(t_trace *trace)
        	** les  premières versions du système, la diffusion broadcast
        	** etait une option privilégiée.
 		*/
-		//if (setsockopt(trace->sock, SOL_SOCKET, SO_BROADCAST, (char*)&opt, sizeof(opt)) != 0)
-		//	return (false);
+		if (setsockopt(trace->sock_snd, SOL_SOCKET, SO_BROADCAST, (char*)&opt, sizeof(opt)) != 0)
+			return (false);
 	}
 /*
 **  SO_DEBUG autorise le débugging dans les modules de  proto­coles
