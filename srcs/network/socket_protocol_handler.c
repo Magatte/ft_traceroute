@@ -92,8 +92,8 @@ char		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
 	time_of = (get_current_time_millis() - trace->start_time);
 	printhost = ip_tab_contains(trace, &addr->sin_addr);
 
-	//if (printhost == false)
-	//{
+	if (printhost == false)
+	{
 		if (trace->ip_tab[0] != NULL)
 			ft_printf("\n   ");
 		ndd = get_hostname_by_in_addr(&addr->sin_addr);
@@ -102,7 +102,7 @@ char		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
 		else
 			ft_printf(" %s ", ip_addr);
 		ft_strdel(&ndd);
-	//}
+	}
 	n_response_time = (time_of / (float)1000);
 	if (n_response_time < 0)
 		n_response_time = 0;
