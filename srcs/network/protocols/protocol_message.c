@@ -49,19 +49,22 @@ BOOLEAN		serialize_message(t_message *message, t_trace *trace)
 	return (true);
 }
 
-t_message		*deserialize_message(void *ptr, t_trace *trace)
+t_message		*deserialize_message(void *ptr, t_trace *trace, int ptr_size)
 {
 	t_message *message;
 
 	if (!(message = new_message(0)))
 		return (NULL);
 	message->data = ptr;
+	message->packet_len = ptr_size;
 	if (trace->use_ip_header)
 	{
 		ft_memcpy(&message->ip_header, message->data, IPHDR_SIZE);
 		message->data += IPHDR_SIZE;
+		message->packet_len -= IPHDR_SIZE;
 	}
 	trace->protocol->deserialize(message, trace);
+	message->packet_len -= trace->protocol->len;
 	return (message);
 }
 

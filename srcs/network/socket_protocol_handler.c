@@ -15,14 +15,21 @@
 void				check_packet(t_trace *trace, void *packet, int ret)
 {
 	t_message *message;
+	int i = 0;
 
-	(void)ret;
-	if (!(message = deserialize_message(packet, trace)))
+	if (!(message = deserialize_message(packet, trace, ret)))
 		return ;
 	if (trace->protocol->e_name == ICMP)
 	{
 		ft_printf("(ttl:%d), (sequence:%d)\n", message->ip_header.ttl, message->icmp_header.un.echo.sequence);
 	}
+	ft_printf("Packet : [");
+	while (i < message->packet_len)
+	{
+		ft_printf("%d ", (char)(message->data + i));
+		i++;
+	}
+	ft_printf("]");
 }
 
 t_message			*parse_packet(t_trace *trace, void *packet, int ret)

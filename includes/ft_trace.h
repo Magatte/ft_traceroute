@@ -152,7 +152,7 @@ BOOLEAN						sendto_message(t_trace *trace);
 t_message					*new_message(size_t size);
 BOOLEAN						serialize_message(t_message *message, t_trace *trace);
 void						destruct_message(t_message *packet);
-t_message		            *deserialize_message(void *ptr, t_trace *trace);
+t_message		            *deserialize_message(void *ptr, t_trace *trace, int ptr_size);
 
 /*
 ** Handler
