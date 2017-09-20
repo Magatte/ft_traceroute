@@ -26,7 +26,7 @@ void				check_packet(t_trace *trace, void *packet, int ret)
 	ft_printf("Packet : [");
 	while (i < message->packet_len)
 	{
-		ft_printf("%d ", (char)(message->data + i));
+		ft_printf("%d ", (int)(message->data + i));
 		i++;
 	}
 	ft_printf("]");
