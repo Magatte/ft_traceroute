@@ -25,7 +25,6 @@ BOOLEAN			initialize_socket_sender_connection(t_trace *trace)
 			printf("(Restart on SOCK_DGRAM socket type)\n");
 			return (initialize_socket_sender_connection(trace));
 		}
-        printf("LALALALLA\n");
 		return (false);
 	}
 	if (!bind_socket(trace))
