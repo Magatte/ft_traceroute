@@ -68,7 +68,7 @@ char		*icmp_handle_message(t_trace *trace)
 	if ((ret = recvfrom(trace->sock, &packet, trace->message->len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
 		//parse_packet(trace, packet, ret);
-		//check_packet(trace, packet, ret);
+		check_packet(trace, packet, ret);
 		return (process_received_message(trace, &from));
 	}
 	return (NULL);
