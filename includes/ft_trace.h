@@ -71,7 +71,8 @@ typedef struct				s_trace
 {
 	char					*shost;		/* string hostargs				*/
 	int						port;		/* port of connection			*/
-	int						sock;		/* socket descriptor ID			*/
+	int						sock;		/* socket Protocol			    */
+    int                     sock_snd;   /* socket RAW sender            */
 	struct sockaddr_in		addr;		/* sockaddr of destination		*/
 	char					*destip;	/* ip of Destination			*/
 	int						pid;		/* pid of current program		*/
@@ -90,7 +91,7 @@ typedef struct				s_trace
 	int						mintime;	/* mintime						*/
 	long					totaltime;	/* medium time					*/
 	int						maxtime;	/* maxtime						*/
-	struct in_addr			**ip_tab;
+	char			        **ip_tab;
 	const struct protocole	*protocol;
 	t_message				*message;
 	int						ping_interval;
@@ -113,19 +114,19 @@ typedef struct				s_trace
 # define F_DEFAULT			trace->flags[7]->actif
 # define F_IP_HDR			trace->flags[8]->actif
 
-# define NB_TEST_CONNECTION	1
+# define NB_TEST_CONNECTION	3
 
 /*
 ** Socket connection
 */
-BOOLEAN						initialize_socket_connection(t_trace *trace);
-# ifdef CONNECTION_FILE
+BOOLEAN						initialize_socket_sender_connection(t_trace *trace);
+BOOLEAN						initialize_socket_protocol_connection(t_trace *trace);
 BOOLEAN						bind_socket(t_trace *trace);
-BOOLEAN						set_on_socket_options(t_trace *trace);
+BOOLEAN						set_on_socket_sender_options(t_trace *trace);
+BOOLEAN			            set_on_socket_protocol_options(t_trace *trace);
 BOOLEAN						socket_connection_is_estabilised(int fd);
 BOOLEAN						bind_error(void);
 BOOLEAN						set_socket_options_error(void);
-# endif
 
 /*
 ** flags manager
@@ -154,8 +155,8 @@ void						destruct_message(t_message *packet);
 /*
 ** Handler
 */
-struct in_addr				*icmp_handle_message(t_trace *trace);
-struct in_addr				*process_received_message(t_trace *trace, struct sockaddr_in *addr);
+char                        *icmp_handle_message(t_trace *trace);
+char                        *process_received_message(t_trace *trace, struct sockaddr_in *addr);
 
 /*
 ** Utils

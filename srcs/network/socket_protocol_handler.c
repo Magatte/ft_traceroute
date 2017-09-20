@@ -59,7 +59,7 @@ t_message			*parse_packet(t_trace *trace, void *packet, int ret)
 /*
 ** read le message icmp header-packet
 */
-struct in_addr		*icmp_handle_message(t_trace *trace)
+char		*icmp_handle_message(t_trace *trace)
 {
 	int	ret;
 	char packet[1024];
@@ -78,32 +78,38 @@ struct in_addr		*icmp_handle_message(t_trace *trace)
 	return (NULL);
 }
 
-struct in_addr		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
+char		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
 {
-	int				time_of;
-	struct in_addr	*ip_addr;
+	float			time_of;
+	char			*ip_addr;
 	BOOLEAN			printhost;
 	char			*ndd;
+	float			n_response_time;
+	char			*response_time;
 
 	
-	if (!(ip_addr = (struct in_addr*)malloc(sizeof(struct in_addr))))
-		return (NULL);
-	ip_addr->s_addr = addr->sin_addr.s_addr;
+	ip_addr = ft_strdup(get_hostname_ipv4(&addr->sin_addr));
 	time_of = (get_current_time_millis() - trace->start_time);
 	printhost = ip_tab_contains(trace, &addr->sin_addr);
 
-	if (printhost == false)
-	{
+	//if (printhost == false)
+	//{
 		if (trace->ip_tab[0] != NULL)
 			ft_printf("\n   ");
 		ndd = get_hostname_by_in_addr(&addr->sin_addr);
 		if (!F_PRINT_HOP_ADDR)
-			ft_printf(" %s (%s)", ndd, get_hostname_ipv4(&addr->sin_addr));
+			ft_printf(" %s (%s)", ndd, ip_addr);
 		else
-			ft_printf(" %s ", get_hostname_ipv4(&addr->sin_addr));
+			ft_printf(" %s ", ip_addr);
 		ft_strdel(&ndd);
-	}
-	ft_printf(" %s ms ", ft_convert_double_to_string(((float)(time_of) / 1000), 3));
+	//}
+	n_response_time = (time_of / (float)1000);
+	if (n_response_time < 0)
+		n_response_time = 0;
+	response_time = ft_convert_double_to_string(n_response_time, 3);
+
+	ft_printf(" %s ms ", response_time);
+	ft_strdel(&response_time);
 	trace->totaltime += time_of;
 	if (trace->mintime == 0 || trace->mintime > time_of)
 		trace->mintime = time_of;

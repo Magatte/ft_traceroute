@@ -24,9 +24,10 @@ BOOLEAN				ip_tab_contains(t_trace *trace, struct in_addr *addr)
 			i++;
 			continue;
 		}
-		if (ft_strcmp(get_hostname_ipv4(addr),\
-            get_hostname_ipv4(trace->ip_tab[i])) == 0)
+		if (ft_strcmp(get_hostname_ipv4(addr), trace->ip_tab[i]) == 0)
+		{
 			return (true);
+		}
 		i++;
 	}
 	return (false);
@@ -51,15 +52,15 @@ void		free_ip_tab(t_trace *trace)
 	while (i < NB_TEST_CONNECTION)
 	{
 		if (trace->ip_tab[i] != NULL)
-			free(trace->ip_tab[i]);
+			ft_strdel(&trace->ip_tab[i]);
 		i++;
 	}
 }
 
 BOOLEAN		load_ip_tab(t_trace *trace)
 {
-	if (!(trace->ip_tab = (struct in_addr**)malloc(\
-        sizeof(struct in_addr*) * NB_TEST_CONNECTION)))
+	if (!(trace->ip_tab = (char **)malloc(\
+        sizeof(char *) * NB_TEST_CONNECTION)))
 		return (false);
 	ft_bzero(&trace->addr, sizeof(trace->addr));
     return (true);
