@@ -25,10 +25,16 @@ void		prepare_udp_header(t_message *message, t_trace *trace)
 	gettimeofday(&message->udp_header.tv, 0);
 }
 
-void		update_udp_checksum(t_message *message, t_trace *trace, size_t iphdr_size)
+void		serialize_udp_header(t_message *message, t_trace *trace, size_t iphdr_size)
 {
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
 	ft_memset(message->data + iphdr_size + trace->protocol->len, '0', message->packet_len);
-	message->udp_header.checksum = 0;//checksum(message->data + iphdr_size, trace->protocol->len + message->packet_len);
+	message->udp_header.checksum = checksum(message->data + iphdr_size, trace->protocol->len + message->packet_len);
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
+}
+
+void		deserialize_udp_header(t_message *message, t_trace *trace)
+{
+	ft_memcpy(&message->udp_header, message->data, trace->protocol->len);
+	message->data = message->data + trace->protocol->len;
 }

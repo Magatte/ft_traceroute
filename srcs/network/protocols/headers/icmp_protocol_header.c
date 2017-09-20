@@ -20,10 +20,16 @@ void		prepare_icmp_header(t_message *message, t_trace *trace)
 	message->icmp_header.checksum = 0;
 }
 
-void		update_icmp_checksum(t_message *message, t_trace *trace, size_t iphdr_size)
+void		serialize_icmp_header(t_message *message, t_trace *trace, size_t iphdr_size)
 {
 	ft_memcpy(message->data + iphdr_size, &message->icmp_header, trace->protocol->len);
 	ft_memset(message->data + iphdr_size + trace->protocol->len, '0', message->packet_len);
 	message->icmp_header.checksum = checksum(message->data + iphdr_size, trace->protocol->len + message->packet_len);
 	ft_memcpy(message->data + iphdr_size, &message->icmp_header, trace->protocol->len);
+}
+
+void		deserialize_icmp_header(t_message *message, t_trace *trace)
+{
+	ft_memcpy(&message->icmp_header, message->data, trace->protocol->len);
+	message->data = message->data + trace->protocol->len;
 }

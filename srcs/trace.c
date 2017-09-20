@@ -78,7 +78,7 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 	//trace->message = new_message(trace->sweepminsize);
 	//trace->message->serialize(trace->message, trace);
 	trace->start_time = get_current_time_millis();
-	res = sendto(trace->sock_snd, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
+	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
 	if (res < 0)
 	{
 		ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
@@ -103,7 +103,7 @@ BOOLEAN		process_loop(t_trace *trace)
 	{
 		//Open socket connection
 		initialize_socket_receiver_connection(trace);
-		initialize_socket_sender_connection(trace);
+		//initialize_socket_sender_connection(trace);
 
 		trace->message = new_message(trace->sweepminsize);
 		trace->message->serialize(trace->message, trace);
@@ -125,7 +125,7 @@ BOOLEAN		process_loop(t_trace *trace)
 		trace->sequence++;
 		//close socket connection
 		close(trace->sock);
-		close(trace->sock_snd);
+		//close(trace->sock_snd);
 		i++;
 	}
 	ft_strdel(&save_addr);

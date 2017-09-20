@@ -23,7 +23,7 @@ void		prepare_tcp_header(t_message *message, t_trace *trace)
 	message->tcp_header.checksum = 0;
 }
 
-void		update_tcp_checksum(t_message *message, t_trace *trace, size_t iphdr_size)
+void		serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size)
 {
 	if (!trace->use_ip_header)
 		return ;
@@ -45,4 +45,10 @@ void		update_tcp_checksum(t_message *message, t_trace *trace, size_t iphdr_size)
 	message->tcp_header.checksum = checksum(tcpcsumblock,  sizeof(tcpcsumblock));
 
 	ft_memcpy(message->data + iphdr_size, &message->tcp_header, trace->protocol->len);
+}
+
+void		deserialize_tcp_header(t_message *message, t_trace *trace)
+{
+	ft_memcpy(&message->tcp_header, message->data, trace->protocol->len);
+	message->data = message->data + trace->protocol->len;
 }

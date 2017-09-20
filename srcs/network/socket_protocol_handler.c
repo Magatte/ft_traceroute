@@ -14,19 +14,15 @@
 
 void				check_packet(t_trace *trace, void *packet, int ret)
 {
-	struct icmphdr *hdr;
+	t_message *message;
 
-	if (trace->protocol->e_name != ICMP)
+	(void)ret;
+	if (!(message = deserialize_message(packet, trace)))
 		return ;
-	if (trace->use_ip_header)
+	if (trace->protocol->e_name == ICMP)
 	{
-		hdr = (struct icmphdr*)(packet + IPHDR_SIZE);
+		ft_printf("(ttl:%d), (sequence:%d)\n", message->ip_header.ttl, message->icmp_header.un.echo.sequence);
 	}
-	else
-	{
-		hdr = (struct icmphdr*)(packet);
-	}
-	ft_printf("(code:%d), (type:%d), (ret:%d)", hdr->code, hdr->type, ret);
 }
 
 t_message			*parse_packet(t_trace *trace, void *packet, int ret)

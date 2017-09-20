@@ -62,6 +62,7 @@ struct protocole
     int                     proto;
     void                    (*prepare_header)();
 	void					(*serialize)();
+    void                    (*deserialize)();
 };
 
 /*
@@ -151,6 +152,7 @@ BOOLEAN						sendto_message(t_trace *trace);
 t_message					*new_message(size_t size);
 BOOLEAN						serialize_message(t_message *message, t_trace *trace);
 void						destruct_message(t_message *packet);
+t_message		            *deserialize_message(void *ptr, t_trace *trace);
 
 /*
 ** Handler
@@ -187,10 +189,16 @@ void		                prepare_udp_header(t_message *message, t_trace *trace);
 void		                prepare_tcp_header(t_message *message, t_trace *trace);
 void		                prepare_gre_header(t_message *message, t_trace *trace);
 
-void					    update_icmp_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
-void					    update_udp_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
-void					    update_tcp_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
-void					    update_gre_checksum(t_message *message, t_trace *trace, size_t iphdr_size);
+void					    serialize_icmp_header(t_message *message, t_trace *trace, size_t iphdr_size);
+void					    serialize_udp_header(t_message *message, t_trace *trace, size_t iphdr_size);
+void					    serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size);
+void					    serialize_gre_header(t_message *message, t_trace *trace, size_t iphdr_size);
+
+void		                deserialize_icmp_header(t_message *message, t_trace *trace);
+void		                deserialize_udp_header(t_message *message, t_trace *trace);
+void		                deserialize_tcp_header(t_message *message, t_trace *trace);
+void		                deserialize_gre_header(t_message *message, t_trace *trace);
+
 
 static const struct protocole protos[MAX_PROTOCOLS] = {
     {
@@ -199,6 +207,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         sizeof(struct iphdr),
         DEFAULT_PROTOCOL,
         prepare_iphdr,
+        NULL,
         NULL
 
     },
@@ -208,7 +217,8 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         sizeof(struct icmphdr),
         ICMP_PROTOCOL,
         prepare_icmp_header,
-        update_icmp_checksum
+        serialize_icmp_header,
+        deserialize_icmp_header
     },
     {
         UDP,
@@ -216,7 +226,8 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         sizeof(struct udphdr),
         UDP_PROTOCOL,
         prepare_udp_header,
-        update_udp_checksum
+        serialize_udp_header,
+        deserialize_udp_header
     },
     {
         TCP,
@@ -224,7 +235,8 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         sizeof(struct tcphdr),
         TCP_PROTOCOL,
         prepare_tcp_header,
-        update_tcp_checksum
+        serialize_tcp_header,
+        deserialize_tcp_header
     },
     {
         GRE,
@@ -232,7 +244,8 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         sizeof(struct grehdr),
         GRE_PROTOCOL,
         prepare_gre_header,
-        update_gre_checksum
+        serialize_gre_header,
+        deserialize_gre_header
     }
 };
 
