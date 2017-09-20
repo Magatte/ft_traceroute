@@ -15,66 +15,23 @@
 void				check_packet(t_trace *trace, void *packet, int ret)
 {
 	t_message *message;
-	int i = 0;
 
 	if (!(message = deserialize_message(packet, trace, ret)))
 		return ;
-	if (trace->protocol->e_name == ICMP)
-	{
-		ft_printf("(ttl:%d), (sequence:%d)\n", message->ip_header.ttl, message->icmp_header.un.echo.sequence);
-	}
-	ft_printf("Packet : [");
-	while (i < message->packet_len)
-	{
-		ft_printf("%d ", (int)(message->data + i));
-		i++;
-	}
-	ft_printf("]");
-}
-
-t_message			*parse_packet(t_trace *trace, void *packet, int ret)
-{
-	t_message *message;
-
-	message = new_message(trace->sweepminsize);
-	(void)packet;
-	(void)ret;
-	if (trace->use_ip_header)
-	{
-		ft_memcpy(&message->ip_header, packet, IPHDR_SIZE);
-		packet += IPHDR_SIZE;
-	}
-
-	if (trace->protocol->e_name == ICMP)
-	{
-		//struct icmphdr *hdr = (struct icmphdr*)packet;
-		ft_memcpy(&message->icmp_header, packet, trace->protocol->len);
-		ft_printf("\nreceiv:\n\n(ttl %d, id %d, seq %d, proto ICMP (1), length %d)\n",
-			message->ip_header.ttl,
-			ntohs(message->icmp_header.un.echo.id),
-			ntohs(message->icmp_header.un.echo.sequence),
-			ret
-			);
-	}
-	return (message);
 }
 
 /*
 ** read le message icmp header-packet
 */
-char		*icmp_handle_message(t_trace *trace)
+char		*handle_message(t_trace *trace)
 {
 	int	ret;
 	char packet[1024];
 	struct sockaddr_in from;
 	socklen_t fromlen = sizeof(from);
-
-	if (trace->ip_tab[0] == NULL)
-		ft_printf("%2d ", trace->ttl);
-	//MSG_OOB
+	
 	if ((ret = recvfrom(trace->sock, &packet, trace->message->len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
-		//parse_packet(trace, packet, ret);
 		check_packet(trace, packet, ret);
 		return (process_received_message(trace, &from));
 	}

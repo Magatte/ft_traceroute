@@ -66,28 +66,9 @@ BOOLEAN			set_on_socket_sender_options(t_trace *trace)
        	** les  premières versions du système, la diffusion broadcast
        	** etait une option privilégiée.
 		*/
-		if (setsockopt(trace->sock_snd, SOL_SOCKET, SO_BROADCAST, (char*)&opt, sizeof(opt)) != 0)
-			return (false);
+		/*if (setsockopt(trace->sock_snd, SOL_SOCKET, SO_BROADCAST, (char*)&opt, sizeof(opt)) != 0)
+			return (false);*/
 	}
-/*
-**  SO_DEBUG autorise le débugging dans les modules de  proto­coles
-**  sous-jacents.
-*/
-	/*if (F_SOCK_DEBUG)
-		if (setsockopt(trace->sock, SOL_SOCKET, SO_DEBUG, (char*)&opt, sizeof(opt)) != 0)
-			return (false);*/
-/*
-**  SO_DONTROUTE indique que les messages  émis  doivent  con­
-**  tourner  les  options  de routage. A la place les messages
-**  sont envoyés directement à l'interface réseau  appropriée,
-**  en utilisant la partie réseau de l'adresse de destination.
-*/
-	/*if (F_DONTROUTE)
-		if (setsockopt(trace->sock, SOL_SOCKET, SO_DONTROUTE, (char*)&opt, sizeof(opt)) != 0)
-			return (false);*/
-/*
-**  SO_RCVTIMEO lit la valeur de timeout en réception (seulement en lecture)
-*/
 	if (setsockopt(trace->sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&trace->timeout, sizeof(trace->timeout)) != 0)
 		return (false);
 	return (true);

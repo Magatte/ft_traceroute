@@ -141,7 +141,7 @@ BOOLEAN			load_size(t_trace *trace, char *arg)
 		return (false);
 	if (!ft_is_string_numeric(arg))
 	{
-		ft_fprintf(1, "traceroute: \"%s\" bad value for packet length", arg);
+		ft_fprintf(1, "traceroute: \"%s\" bad value for packet length\n", arg);
 		exit(0);
 	}
 	size = ft_atoi(arg);
@@ -173,8 +173,6 @@ BOOLEAN			load_host(t_trace *trace, char *arg)
 	trace->shost = ft_strdup(arg);
 	in = get_sockaddr_in_ipv4(trace->shost);
 	if (in == NULL) {
-		ft_strdel(&trace->shost);
-		trace->shost = NULL;
 		return (false);
 	}
 	trace->addr = *in;

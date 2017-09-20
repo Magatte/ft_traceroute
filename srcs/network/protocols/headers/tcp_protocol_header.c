@@ -14,13 +14,13 @@
 
 void		prepare_tcp_header(t_message *message, t_trace *trace)
 {
-	message->tcp_header.source = htons(trace->pid);
-	message->tcp_header.dest = htons(trace->port + trace->sequence);
-	message->tcp_header.sequence = htons(trace->sequence);
-	message->tcp_header.ack = htonl(1);
+	message->tcp_header.th_sport = htons(trace->pid);
+	message->tcp_header.th_dport = htons(trace->port + trace->sequence);
+	message->tcp_header.th_seq = htons(trace->sequence);
+	message->tcp_header.th_ack = htonl(1);
 	message->tcp_header.th_off = 5;
-	message->tcp_header.flags = TH_SYN;
-	message->tcp_header.checksum = 0;
+	message->tcp_header.th_flags = TH_SYN;
+	message->tcp_header.th_sum = 0;
 }
 
 void		serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size)
@@ -42,7 +42,7 @@ void		serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size
 	ft_memcpy(tcpcsumblock, &message->pseudoheader, sizeof(struct pseudoheader));
   	ft_memcpy(tcpcsumblock + sizeof(struct pseudoheader), &message->tcp_header, sizeof(struct tcphdr));
 
-	message->tcp_header.checksum = checksum(tcpcsumblock,  sizeof(tcpcsumblock));
+	message->tcp_header.th_sum = checksum(tcpcsumblock,  sizeof(tcpcsumblock));
 
 	ft_memcpy(message->data + iphdr_size, &message->tcp_header, trace->protocol->len);
 }

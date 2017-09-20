@@ -90,13 +90,13 @@ $(OBJDIR)%.o : $(SRCDIR)%.c | $(OBJDIR)
 
 clean:
 	echo -en "\r\033[38;5;101mCLEAN  "														\
-		"[\033[0m$(NAMEBASE)\033[38;5;101m]\033[K";											\
+		"[\033[0m$(NAMEBASE)\033[38;5;101m]\033[K\033[0m";									\
 	rm -rf $(OBJDIR)
 	make -C $(LIBFTDIR) clean
 
 fclean:
 	echo -en "\r\033[38;5;124mFCLEAN "														\
-		"[\033[0m$(NAMEBASE)\033[38;5;124m]\033[K";											\
+		"[\033[0m$(NAMEBASE)\033[38;5;124m]\033[K\033[0m";									\
 	rm -rf $(PROG1)
 	rm -rf $(OBJDIR)
 	make -C $(LIBFTDIR) fclean

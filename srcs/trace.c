@@ -75,8 +75,6 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 	int		res;
 
 	trace->send++;
-	//trace->message = new_message(trace->sweepminsize);
-	//trace->message->serialize(trace->message, trace);
 	trace->start_time = get_current_time_millis();
 	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
 	if (res < 0)
@@ -103,13 +101,13 @@ BOOLEAN		process_loop(t_trace *trace)
 	{
 		//Open socket connection
 		initialize_socket_receiver_connection(trace);
-		//initialize_socket_sender_connection(trace);
+		initialize_socket_sender_connection(trace);
 
 		trace->message = new_message(trace->sweepminsize);
 		trace->message->serialize(trace->message, trace);
 
 		send_message(trace, trace->message);
-		if ((trace->ip_tab[i] = icmp_handle_message(trace)) != NULL)
+		if ((trace->ip_tab[i] = handle_message(trace)) != NULL)
 		{
 			if (ft_strcmp(trace->ip_tab[i], save_addr) == 0)
 				trace->retry = false;
@@ -125,7 +123,7 @@ BOOLEAN		process_loop(t_trace *trace)
 		trace->sequence++;
 		//close socket connection
 		close(trace->sock);
-		//close(trace->sock_snd);
+		close(trace->sock_snd);
 		i++;
 	}
 	ft_strdel(&save_addr);
@@ -135,11 +133,10 @@ BOOLEAN		process_loop(t_trace *trace)
 
 BOOLEAN		process_traceroute(t_trace *trace)
 {
-	printf("My pid = htons %d\n", htons(trace->pid));
-	printf("My pid =       %d\n", trace->pid);
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_ip_tab(trace);
+		ft_printf("%2d ", trace->ttl);
 		if (process_loop(trace) == false) {
 			free_ip_tab(trace);
 			break ;

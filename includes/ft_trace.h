@@ -25,6 +25,7 @@
 # include <mapft.h>
 # include <unistd.h>
 # include <netdb.h>
+# include <netinet/tcp.h>
 
 # include "protocol_message.h"
 
@@ -157,7 +158,7 @@ t_message		            *deserialize_message(void *ptr, t_trace *trace, int ptr_s
 /*
 ** Handler
 */
-char                        *icmp_handle_message(t_trace *trace);
+char                        *handle_message(t_trace *trace);
 char                        *process_received_message(t_trace *trace, struct sockaddr_in *addr);
 
 /*

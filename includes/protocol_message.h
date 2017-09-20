@@ -48,10 +48,6 @@
 # define SOL_TCP            6
 # define SOL_IP             0
 
-# define TCP_KEEPCNT        5
-# define TCP_KEEPIDLE       5
-# define TCP_KEEPINTVL      1
-
 /*
 ** ICMP MESSAGE TYPES
 */
@@ -157,35 +153,6 @@ typedef struct pseudoheader
 	u_char protocol;
 	u_int16_t tcplen;
 }				tcp_phdr_t;
-
-/*
- * TCP header.
- * Per RFC 793, September, 1981.
- */
-struct tcphdr {
-	u_short                 source;		    /* source port */
-	u_short                 dest;		    /* destination port */
-	u_int                   sequence;		/* sequence number */
-	u_int                   ack;			/* acknowledgement number */
-#if BYTE_ORDER == LITTLE_ENDIAN 
-	u_short                 th_x2:4,		/* (unused) */
-		                    th_off:4;		/* data offset */
-#endif
-#if BYTE_ORDER == BIG_ENDIAN 
-	u_short	                th_off:4,		/* data offset */
-		                    th_x2:4;		/* (unused) */
-#endif
-	u_short	                flags;          /* options of type msg */
-#define	TH_FIN              0x01
-#define	TH_SYN              0x02
-#define	TH_RST              0x04
-#define	TH_PUSH             0x08
-#define	TH_ACK              0x10
-#define	TH_URG              0x20
-	u_short                 win;			/* window */
-	u_short                 checksum;		/* checksum */
-	u_short	                urp;			/* urgent pointer */
-};
 
 struct grehdr
 {
