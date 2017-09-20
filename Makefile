@@ -46,7 +46,7 @@ SRCSPROG1	=	\
 				srcs/utils/array_ip_tab.c													\
 				srcs/network/protocols/utils/sum.c											\
 				srcs/network/socket_protocol_handler.c										\
-				srcs/network/socket_protocol.c												\
+				srcs/network/socket_receiver.c												\
 				srcs/network/socket_sender.c												\
 				srcs/network/protocols/protocol_message.c									\
 				srcs/network/protocols/headers/ip_protocol_header.c							\

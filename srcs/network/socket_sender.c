@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#define SOCKET_SENDER_FILE
-
 #include "ft_trace.h"
 
 BOOLEAN			initialize_socket_sender_connection(t_trace *trace)

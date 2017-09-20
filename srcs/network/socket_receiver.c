@@ -10,11 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#define SOCKET_PROTOCOL_FILE
-
 #include "ft_trace.h"
 
-BOOLEAN			initialize_socket_protocol_connection(t_trace *trace)
+BOOLEAN			initialize_socket_receiver_connection(t_trace *trace)
 {
 	trace->sock = socket(PROT_INTERNET_IPV4, trace->socket_type, trace->protocol->proto);
 	if (!socket_connection_is_estabilised(trace->sock))
@@ -23,7 +21,7 @@ BOOLEAN			initialize_socket_protocol_connection(t_trace *trace)
 		{
 			trace->socket_type = SOCK_DGRAM;
 			printf("(Restart on SOCK_DGRAM socket type)\n");
-			return (initialize_socket_protocol_connection(trace));
+			return (initialize_socket_receiver_connection(trace));
 		}
 		return (false);
 	}

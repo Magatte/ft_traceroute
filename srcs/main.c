@@ -33,6 +33,7 @@ int	main(int argc, char **argv)
 			return (0);
 		if (trace->destip)
 		{
+			printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
 			trace->launch(trace);
 		}
 		else

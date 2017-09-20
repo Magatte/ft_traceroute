@@ -120,7 +120,7 @@ typedef struct				s_trace
 ** Socket connection
 */
 BOOLEAN						initialize_socket_sender_connection(t_trace *trace);
-BOOLEAN						initialize_socket_protocol_connection(t_trace *trace);
+BOOLEAN						initialize_socket_receiver_connection(t_trace *trace);
 BOOLEAN						bind_socket(t_trace *trace);
 BOOLEAN						set_on_socket_sender_options(t_trace *trace);
 BOOLEAN			            set_on_socket_protocol_options(t_trace *trace);

@@ -102,7 +102,7 @@ BOOLEAN		process_loop(t_trace *trace)
 	while (i < NB_TEST_CONNECTION)
 	{
 		//Open socket connection
-		initialize_socket_protocol_connection(trace);
+		initialize_socket_receiver_connection(trace);
 		initialize_socket_sender_connection(trace);
 
 		trace->message = new_message(trace->sweepminsize);
@@ -125,6 +125,7 @@ BOOLEAN		process_loop(t_trace *trace)
 		trace->sequence++;
 		//close socket connection
 		close(trace->sock);
+		close(trace->sock_snd);
 		i++;
 	}
 	ft_strdel(&save_addr);
@@ -134,7 +135,6 @@ BOOLEAN		process_loop(t_trace *trace)
 
 BOOLEAN		process_traceroute(t_trace *trace)
 {
-	printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->destip, trace->max_hop, trace->sweepminsize);
 	printf("My pid = htons %d\n", htons(trace->pid));
 	printf("My pid =       %d\n", trace->pid);
 	while (trace->ttl <= trace->max_hop && trace->retry)
