@@ -175,6 +175,7 @@ BOOLEAN			load_host(t_trace *trace, char *arg)
 	if (in == NULL) {
 		return (false);
 	}
+	trace->addr = *in;
 	trace->dest_ip = ft_strdup(get_hostname_ipv4(&in->sin_addr));
 	return (true);
 }

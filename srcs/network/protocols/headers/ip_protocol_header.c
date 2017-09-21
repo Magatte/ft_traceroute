@@ -32,8 +32,15 @@ void		prepare_iphdr(t_message *message, t_trace *trace)
 	message->ip_header.len = trace->protocol->len + IPHDR_SIZE + message->packet_len;
 	message->ip_header.checksum = 0;
 	message->ip_header.checksum = 0;
-	message->ip_header.src = get_sockaddr_in_ipv4(trace->source_ip)->sin_addr;
-	message->ip_header.dest = get_sockaddr_in_ipv4(trace->dest_ip)->sin_addr;
+
+	char *tmp_src = ft_strdup(trace->source_ip);
+	char *tmp_dest = ft_strdup(trace->dest_ip);
+
+	message->ip_header.src = get_sockaddr_in_ipv4(tmp_src)->sin_addr;
+	message->ip_header.dest = get_sockaddr_in_ipv4(tmp_dest)->sin_addr;
+
+	free(tmp_src);
+	free(tmp_dest);
 }
 
 void		serialize_ip_header(t_message *message, t_trace *trace, size_t iphdr_size)
