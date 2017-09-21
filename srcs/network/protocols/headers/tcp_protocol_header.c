@@ -160,10 +160,10 @@
 void		prepare_tcp_header(t_message *message, t_trace *trace)
 {
 	message->tcp_header.source = htons(trace->pid);
-	message->tcp_header.dest = htons(trace->port + trace->sequence);
+	message->tcp_header.dest = htons(trace->port);
 	message->tcp_header.seq = htons(trace->sequence);
 	message->tcp_header.ack_seq = htonl(1);
-	message->tcp_header.doff = 5;//tcp header size
+	message->tcp_header.doff = 4;//tcp header size
 	message->tcp_header.fin = 0;
 	message->tcp_header.syn = 1;
 	message->tcp_header.rst = 0;
