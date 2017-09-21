@@ -14,13 +14,13 @@
 
 void		prepare_iphdr(t_message *message, t_trace *trace)
 {
-	message->ip_header.src.s_addr = INADDR_ANY;
+	//message->ip_header.src.s_addr = INADDR_ANY;
 
-	if (!(inet_pton(AF_INET, trace->destip, &message->ip_header.dest)))
+	/*if (!(inet_pton(AF_INET, trace->destip, &message->ip_header.dest)))
 	{
 		printf("ft_trace: Can't set destination network address\n");
 		exit(EXIT_FAILURE);
-	}
+	}*/
 
 	message->ip_header.ttl = trace->ttl;
 	message->ip_header.protocol = trace->protocol->proto;
@@ -32,6 +32,8 @@ void		prepare_iphdr(t_message *message, t_trace *trace)
 	message->ip_header.len = trace->protocol->len + IPHDR_SIZE + message->packet_len;
 	message->ip_header.checksum = 0;
 	message->ip_header.checksum = 0;
+	message->ip_header.src = get_sockaddr_in_ipv4(trace->source_ip)->sin_addr;
+	message->ip_header.dest = get_sockaddr_in_ipv4(trace->dest_ip)->sin_addr;
 }
 
 void		serialize_ip_header(t_message *message, t_trace *trace, size_t iphdr_size)

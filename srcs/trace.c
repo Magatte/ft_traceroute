@@ -22,7 +22,7 @@ t_trace		*singleton_trace(void)
 		return (NULL);
 	trace->sequence = 0;
 	trace->shost = NULL;
-	trace->destip = NULL;
+	//trace->destip = NULL;
 	trace->port = 80;
 	trace->launch = process_traceroute;
 	trace->received = 0;
@@ -44,6 +44,8 @@ t_trace		*singleton_trace(void)
 # ifdef __linux__
 	trace->use_ip_header = true;
 #endif
+	trace->dest_ip = NULL;
+	trace->source_ip = ft_strdup("10.11.9.3");
 	trace->ping_interval = DEFAULT_PING_INTERVAL;
 	if (!load_ip_tab(trace))
 		return (NULL);
@@ -65,7 +67,7 @@ void		destruct_trace(t_trace *trace)
 	free(trace->flags);
 	if (trace->shost != NULL)
 		ft_strdel(&trace->shost);
-	ft_strdel(&trace->destip);
+	//ft_strdel(&trace->destip);
 	free(trace->ip_tab);
 	free(trace);
 }
@@ -93,10 +95,10 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 BOOLEAN		process_loop(t_trace *trace)
 {
 	int i;
-	char *save_addr;
+	//char *save_addr;
 
 	i = 0;
-	save_addr = ft_strdup(trace->destip);
+	//save_addr = ft_strdup(trace->destip);
 	while (i < NB_TEST_CONNECTION)
 	{
 		//Open socket connection
@@ -109,7 +111,7 @@ BOOLEAN		process_loop(t_trace *trace)
 		send_message(trace, trace->message);
 		if ((trace->ip_tab[i] = handle_message(trace)) != NULL)
 		{
-			if (ft_strcmp(trace->ip_tab[i], save_addr) == 0)
+			if (ft_strcmp(trace->ip_tab[i], trace->dest_ip) == 0)
 				trace->retry = false;
 		}
 		else
@@ -118,15 +120,15 @@ BOOLEAN		process_loop(t_trace *trace)
 		}
 		free(trace->message->data);
 		free(trace->message);
-		free(trace->destip);
-		trace->destip = ft_strdup(save_addr);
+		//free(trace->destip);
+		//trace->destip = ft_strdup(save_addr);
 		trace->sequence++;
 		//close socket connection
 		close(trace->sock);
 		close(trace->sock_snd);
 		i++;
 	}
-	ft_strdel(&save_addr);
+	//ft_strdel(&save_addr);
 	ft_printf("\n");
 	return (trace->retry);
 }

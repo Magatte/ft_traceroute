@@ -75,7 +75,7 @@ typedef struct				s_trace
 	int						sock;		/* socket Protocol			    */
     int                     sock_snd;   /* socket RAW sender            */
 	struct sockaddr_in		addr;		/* sockaddr of destination		*/
-	char					*destip;	/* ip of Destination			*/
+	//char					*destip;	/* ip of Destination			*/
 	int						pid;		/* pid of current program		*/
 	int						ttl;		/* time to live  				*/
 	int						max_hop;
@@ -99,6 +99,8 @@ typedef struct				s_trace
 	BOOLEAN					retry;
     BOOLEAN                 use_ip_header;
     int                     socket_type;
+    char                    *source_ip;
+    char                    *dest_ip;
 }							t_trace;
 
 # define DEFAULT_PING_INTERVAL 3
