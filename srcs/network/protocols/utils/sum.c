@@ -31,7 +31,10 @@ unsigned short checksum(void *b, int len)
 		len -= 2;
 	}
 	if (len == 1)
+	{
+		printf("COUCOU == 1\n");
 		sum += buf[0] & 0xFF;
+	}
 	low = (sum & 0xFFFF);			/* prend les 2 octet de droite					*/
 	high = (sum >> 16);				/* prend les 2 octet de gauche					*/
 	sum = high + low;				/* aditionne le tout							*/
