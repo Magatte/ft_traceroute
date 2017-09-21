@@ -14,7 +14,7 @@
 
 BOOLEAN			initialize_socket_sender_connection(t_trace *trace)
 {
-	trace->sock_snd = socket(PROT_INTERNET_IPV4, trace->socket_type, trace->protocol->proto);//IPPROTO_RAW);
+	trace->sock_snd = socket(PROT_INTERNET_IPV4, trace->socket_type, trace->protocol->proto);
 	if (!socket_connection_is_estabilised(trace->sock_snd))
 	{
 		if (trace->sock_snd && trace->socket_type == SOCK_RAW)
