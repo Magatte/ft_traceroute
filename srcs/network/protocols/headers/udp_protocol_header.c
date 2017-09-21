@@ -18,7 +18,7 @@ void		prepare_udp_header(t_message *message, t_trace *trace)
 {
 	message->udp_header.source = htons(trace->pid);
 	message->udp_header.dest = htons(trace->port + trace->sequence);
-	message->udp_header.len = htons((u_short)(trace->protocol->len));
+	message->udp_header.len = htons(trace->protocol->len + message->packet_len);
 	message->udp_header.checksum = 0;
 	message->udp_header.sec = trace->sequence;
 	message->udp_header.ttl = trace->ttl;
@@ -28,8 +28,7 @@ void		prepare_udp_header(t_message *message, t_trace *trace)
 void		serialize_udp_header(t_message *message, t_trace *trace, size_t iphdr_size)
 {
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
-	ft_memset(message->data + iphdr_size + trace->protocol->len, '0', message->packet_len);
-	message->udp_header.checksum = checksum(message->data + iphdr_size, trace->protocol->len + message->packet_len);
+	message->udp_header.checksum = 0;
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
 }
 
