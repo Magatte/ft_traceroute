@@ -17,7 +17,7 @@
 void		prepare_udp_header(t_message *message, t_trace *trace)
 {
 	message->udp_header.source = htons(trace->pid);
-	message->udp_header.dest = htons(trace->port + trace->sequence);
+	message->udp_header.dest = htons(trace->port);
 	message->udp_header.len = htons(trace->protocol->len + message->packet_len);
 	message->udp_header.checksum = 0;
 	message->udp_header.sec = trace->sequence;
