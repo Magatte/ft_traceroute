@@ -36,11 +36,11 @@ BOOLEAN		serialize_message(t_message *message, t_trace *trace)
 	}
 	//set message total length
 	message->len = trace->protocol->len + iphdr_size + message->packet_len;
+	if (!(message->data = ft_strnew(iphdr_size + trace->protocol->len + message->packet_len)))
+		return (false);
 	//prepare protocol header
 	trace->protocol->prepare_header(message, trace);
 	//serialize message
-	if (!(message->data = ft_strnew(iphdr_size + trace->protocol->len + message->packet_len)))
-		return (false);
 	if (trace->use_ip_header)
 	{
 		ft_memcpy(message->data, &message->ip_header, IPHDR_SIZE);
