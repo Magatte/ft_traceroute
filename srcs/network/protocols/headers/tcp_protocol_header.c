@@ -186,6 +186,7 @@ void		add_tcp_options(t_message *message, t_trace *trace)
 		iphdr_size = IPHDR_SIZE;
 	options_size = 2;
 	opt = 1;
+	//No operation
 	ft_memcpy(message->data + iphdr_size + trace->protocol->len, &opt, 1);
 	//End of option list
 	opt = 0;
@@ -210,9 +211,9 @@ void		serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size
 
 	ft_memcpy(tcpcsumblock, &message->pseudoheader, sizeof(struct pseudoheader));
   	ft_memcpy(tcpcsumblock + sizeof(struct pseudoheader), &message->tcp_header, sizeof(struct tcphdr));
-	//add payload
-	//ft_memcpy(tcpcsumblock + sizeof(struct pseudoheader), &message->tcp_header, message->packet_len);
-
+	
+	//add options and payload
+	ft_memcpy(tcpcsumblock + sizeof(struct pseudoheader) + trace->protocol->len, message->data + sizeof(struct pseudoheader) + trace->protocol->len, message->packet_len);
 	message->tcp_header.check = checksum(tcpcsumblock,  psize);
 
 	ft_memcpy(message->data + iphdr_size, &message->tcp_header, trace->protocol->len);
