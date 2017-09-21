@@ -200,6 +200,7 @@ void		                deserialize_udp_header(t_message *message, t_trace *trace)
 void		                deserialize_tcp_header(t_message *message, t_trace *trace);
 void		                deserialize_gre_header(t_message *message, t_trace *trace);
 
+void		                add_tcp_options(t_message *message, t_trace *trace);
 
 static const struct protocole protos[MAX_PROTOCOLS] = {
     {

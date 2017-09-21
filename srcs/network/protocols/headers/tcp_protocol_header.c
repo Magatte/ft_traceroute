@@ -173,6 +173,30 @@ void		prepare_tcp_header(t_message *message, t_trace *trace)
 	message->tcp_header.window = htons(5840);/* maximum allowed window size */
 	message->tcp_header.check = 0;
 	message->tcp_header.urg_ptr = 0;
+	add_tcp_options(message, trace);
+}
+
+void		add_tcp_options(t_message *message, t_trace *trace)
+{
+	char 	*ptr;
+	int		options_size;
+	char	opt;
+	size_t		iphdr_size = 0;
+
+	if (trace->use_ip_header)
+		iphdr_size = IPHDR_SIZE;
+
+	options_size = 2;
+	if (!(ptr = ft_strnew(message->len + options_size)))
+		return ;
+	ft_memcpy(ptr, message->data, message->len);
+	message->data = ptr;
+
+	opt = 1;
+	ft_memcpy(message->data + iphdr_size + trace->protocol->len, &opt, 1);
+	//End of option list
+	ft_memcpy(message->data + iphdr_size + trace->protocol->len + 1, 0, 1);
+	message->packet_len += options_size;
 }
 
 void		serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size)
@@ -181,12 +205,12 @@ void		serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size
 	char tcpcsumblock[psize];
 
 	ft_memcpy(message->data + iphdr_size, &message->tcp_header, trace->protocol->len);
-	ft_memset(message->data + iphdr_size + trace->protocol->len, '0', message->packet_len);
+	ft_memset(tcpcsumblock, 0, psize);
 
 	message->pseudoheader.src = message->ip_header.src.s_addr;
 	message->pseudoheader.dst = message->ip_header.dest.s_addr;
 	message->pseudoheader.zero = 0;
-	message->pseudoheader.protocol = message->ip_header.protocol;
+	message->pseudoheader.protocol = trace->protocol->proto;
 	message->pseudoheader.tcp_length = htons(trace->protocol->len + message->packet_len);
 
 	ft_memcpy(tcpcsumblock, &message->pseudoheader, sizeof(struct pseudoheader));
