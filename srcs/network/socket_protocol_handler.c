@@ -12,12 +12,12 @@
 
 #include "ft_trace.h"
 
-void				check_packet(t_trace *trace, void *packet, int ret)
+BOOLEAN				check_packet(t_trace *trace, void *packet, int ret)
 {
 	t_message *message;
 
 	if (!(message = deserialize_message(packet, trace, ret)))
-		return ;
+		return (true);
 	if (trace->protocol->e_name == TCP)
 	{
 		char *srcip = ft_strdup(get_hostname_ipv4(&message->ip_header.src));
@@ -27,7 +27,14 @@ void				check_packet(t_trace *trace, void *packet, int ret)
 		printf("DESTIP: %s, SRCIP: %s, TTL: %d, LEN: %d\n", destip, srcip, message->ip_header.ttl, message->ip_header.len);
 		printf("TCP_HEADER :\n");
 		printf("PORT: %d, SEQ: %d\n", ntohs(message->tcp_header.dest), ntohs(message->tcp_header.seq));
+		if (ntohs(message->tcp_header.dest) != trace->port)
+		{
+			free(message);
+			return (false);
+		}
 	}
+	free(message);
+	return (true);
 }
 
 /*
@@ -42,7 +49,8 @@ char		*handle_message(t_trace *trace)
 	
 	if ((ret = recvfrom(trace->sock, &packet, trace->message->len, 0, (struct sockaddr*)&from, &fromlen)) != -1)
 	{
-		check_packet(trace, packet, ret);
+		if (!check_packet(trace, packet, ret))
+			return (handle_message(trace));
 		return (process_received_message(trace, &from));
 	}
 	return (NULL);
