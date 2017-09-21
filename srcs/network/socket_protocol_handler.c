@@ -26,7 +26,7 @@ void				check_packet(t_trace *trace, void *packet, int ret)
 		printf("\nIP_HEADER :\n");
 		printf("DESTIP: %s, SRCIP: %s, TTL: %d, LEN: %d\n", destip, srcip, message->ip_header.ttl, message->ip_header.len);
 		printf("TCP_HEADER :\n");
-		printf("PORT: %d, SEQ: %d\n", message->tcp_header.dest, message->tcp_header.seq);
+		printf("PORT: %d, SEQ: %d\n", ntohs(message->tcp_header.dest), ntohs(message->tcp_header.seq));
 	}
 }
 
