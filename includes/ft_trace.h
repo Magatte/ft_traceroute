@@ -25,7 +25,6 @@
 # include <mapft.h>
 # include <unistd.h>
 # include <netdb.h>
-# include <netinet/tcp.h>
 
 # include "protocol_message.h"
 
@@ -190,6 +189,7 @@ void		                prepare_udp_header(t_message *message, t_trace *trace);
 void		                prepare_tcp_header(t_message *message, t_trace *trace);
 void		                prepare_gre_header(t_message *message, t_trace *trace);
 
+void					    serialize_ip_header(t_message *message, t_trace *trace, size_t iphdr_size);
 void					    serialize_icmp_header(t_message *message, t_trace *trace, size_t iphdr_size);
 void					    serialize_udp_header(t_message *message, t_trace *trace, size_t iphdr_size);
 void					    serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size);
@@ -208,7 +208,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         sizeof(struct iphdr),
         DEFAULT_PROTOCOL,
         prepare_iphdr,
-        NULL,
+        serialize_ip_header,
         NULL
 
     },

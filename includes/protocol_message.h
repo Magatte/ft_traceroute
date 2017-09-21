@@ -145,14 +145,48 @@ struct udphdr
     struct timeval          tv;
 };
 
-typedef struct pseudoheader
+struct tcphdr
 {
-	u_int32_t src;
-	u_int32_t dst;
-	u_char zero;
-	u_char protocol;
-	u_int16_t tcplen;
-}				tcp_phdr_t;
+	u_int16_t source;
+	u_int16_t dest;
+	u_int32_t seq;
+	u_int32_t ack_seq;
+# if __BYTE_ORDER == __LITTLE_ENDIAN
+	u_int16_t res1:4;
+	u_int16_t doff:4;
+	u_int16_t fin:1;
+	u_int16_t syn:1;
+	u_int16_t rst:1;
+	u_int16_t psh:1;
+	u_int16_t ack:1;
+	u_int16_t urg:1;
+	u_int16_t res2:2;
+# elif __BYTE_ORDER == __BIG_ENDIAN
+	u_int16_t doff:4;
+	u_int16_t res1:4;
+	u_int16_t res2:2;
+	u_int16_t urg:1;
+	u_int16_t ack:1;
+	u_int16_t psh:1;
+	u_int16_t rst:1;
+	u_int16_t syn:1;
+	u_int16_t fin:1;
+# else
+#  error "Adjust your <bits/endian.h> defines"
+# endif
+	u_int16_t window;
+	u_int16_t check;
+	u_int16_t urg_ptr;
+};
+
+struct pseudoheader
+{
+	u_int32_t				src;			/*source ip address 32bits*/
+	u_int32_t				dst;			/*destination ip address 32bits*/
+	u_char					zero;			/*0 8bits				*/
+	u_char					protocol;       /* IP Protocol 8bits	*/
+	u_int16_t				tcp_length;		/* total length 16bits  */
+};
 
 struct grehdr
 {
