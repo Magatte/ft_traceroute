@@ -18,6 +18,10 @@ void				check_packet(t_trace *trace, void *packet, int ret)
 
 	if (!(message = deserialize_message(packet, trace, ret)))
 		return ;
+	if (trace->protocol->e_name == TCP)
+	{
+		printf("PORT : %d, SEQ : %d\n", message->tcp_header.dest, message->tcp_header.seq);
+	}
 }
 
 /*
