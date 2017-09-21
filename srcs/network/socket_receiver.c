@@ -25,14 +25,14 @@ BOOLEAN			initialize_socket_receiver_connection(t_trace *trace)
 		}
 		return (false);
 	}
-	if (!bind_socket(trace))
+	if (!bind_socket_receiver(trace))
 		return (bind_error());
 	if (!set_on_socket_protocol_options(trace))
 		return (set_socket_options_error());
 	return (true);
 }
 
-BOOLEAN			bind_socket(t_trace *trace)
+BOOLEAN			bind_socket_receiver(t_trace *trace)
 {
 	struct sockaddr_in sock_addr; 
 
@@ -40,7 +40,7 @@ BOOLEAN			bind_socket(t_trace *trace)
 	sock_addr.sin_family = PROT_INTERNET_IPV4;
 	sock_addr.sin_addr.s_addr = INADDR_ANY;
 	sock_addr.sin_port = htons(trace->port);
-	if (bind(trace->sock_snd, (struct sockaddr*)&sock_addr,\
+	if (bind(trace->sock, (struct sockaddr*)&sock_addr,\
 		sizeof(struct sockaddr)) < 0)
 		return (false);
 	return (true);

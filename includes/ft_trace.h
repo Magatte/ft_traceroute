@@ -124,7 +124,8 @@ typedef struct				s_trace
 */
 BOOLEAN						initialize_socket_sender_connection(t_trace *trace);
 BOOLEAN						initialize_socket_receiver_connection(t_trace *trace);
-BOOLEAN						bind_socket(t_trace *trace);
+BOOLEAN						bind_socket_sender(t_trace *trace);
+BOOLEAN						bind_socket_receiver(t_trace *trace);
 BOOLEAN						set_on_socket_sender_options(t_trace *trace);
 BOOLEAN			            set_on_socket_protocol_options(t_trace *trace);
 BOOLEAN						socket_connection_is_estabilised(int fd);
