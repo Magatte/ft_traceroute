@@ -176,21 +176,44 @@ void		prepare_tcp_header(t_message *message, t_trace *trace)
 	add_tcp_options(message, trace);
 }
 
+struct	timestamp_tcp_option
+{
+	u_char	kind;		/* Kind id 				*/
+	u_char	length;		/* length set to 10 	*/
+	u_long	val;		/* Timestamp value		*/
+	u_long	echo;		/* Timestamp echo reply	*/
+};
+
 void		add_tcp_options(t_message *message, t_trace *trace)
 {
-	int		options_size;
-	char	opt;
+	int			options_size = 0;
+	char		opt = 0;
 	size_t		iphdr_size = 0;
 
 	if (trace->use_ip_header)
 		iphdr_size = IPHDR_SIZE;
-	options_size = 2;
+	//No operation #########################################################
 	opt = 1;
-	//No operation
-	ft_memcpy(message->data + iphdr_size + trace->protocol->len, &opt, 1);
-	//End of option list
+	ft_memcpy(message->data + iphdr_size + trace->protocol->len + options_size, &opt, 1);
+	options_size += 1;
+	//No operation #########################################################
+	opt = 1;
+	ft_memcpy(message->data + iphdr_size + trace->protocol->len + options_size, &opt, 1);
+	options_size += 1;
+	//TSOPT, Timestamp. ####################################################
+	struct timestamp_tcp_option ts_opt;
+	ft_memset(&ts_opt, 0, sizeof(struct timestamp_tcp_option));
+	ts_opt.kind = 8;
+	ts_opt.length = 10;
+	ts_opt.val = get_current_time_millis();
+	ts_opt.echo = 0;
+	ft_memcpy(message->data + iphdr_size + trace->protocol->len + options_size, &ts_opt, sizeof(struct timestamp_tcp_option));
+	options_size += sizeof(struct timestamp_tcp_option);
+	//End of option list ###################################################
 	opt = 0;
-	ft_memcpy(message->data + iphdr_size + trace->protocol->len + 1, &opt, 1);
+	ft_memcpy(message->data + iphdr_size + trace->protocol->len + options_size, &opt, 1);
+	options_size += 1;
+	//Update message length
 	message->packet_len += options_size;
 	message->len += options_size;
 }
