@@ -41,10 +41,6 @@ BOOLEAN		serialize_message(t_message *message, t_trace *trace)
 	//prepare protocol header
 	trace->protocol->prepare_header(message, trace);
 	//serialize message
-	if (trace->use_ip_header)
-	{
-		ft_memcpy(message->data, &message->ip_header, IPHDR_SIZE);
-	}
 	trace->protocol->serialize(message, trace, iphdr_size);
 	if (trace->use_ip_header)
 	{

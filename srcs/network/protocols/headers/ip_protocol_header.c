@@ -29,7 +29,7 @@ void		prepare_iphdr(t_message *message, t_trace *trace)
 	message->ip_header.pid = htons(trace->pid);
 	message->ip_header.service = 0;
 	message->ip_header.off = 0;
-	message->ip_header.len = trace->protocol->len + IPHDR_SIZE + message->packet_len;
+	message->ip_header.len = IPHDR_SIZE + trace->protocol->len + message->packet_len;
 	message->ip_header.checksum = 0;
 	message->ip_header.checksum = 0;
 
@@ -45,7 +45,8 @@ void		prepare_iphdr(t_message *message, t_trace *trace)
 
 void		serialize_ip_header(t_message *message, t_trace *trace, size_t iphdr_size)
 {
-	(void)trace;
 	(void)iphdr_size;
+	message->ip_header.len = IPHDR_SIZE + trace->protocol->len + message->packet_len;
+	ft_memcpy(message->data, &message->ip_header, IPHDR_SIZE);
 	message->ip_header.checksum = checksum(&message->data, message->ip_header.len);
 }
