@@ -178,25 +178,20 @@ void		prepare_tcp_header(t_message *message, t_trace *trace)
 
 void		add_tcp_options(t_message *message, t_trace *trace)
 {
-	char 	*ptr;
 	int		options_size;
 	char	opt;
 	size_t		iphdr_size = 0;
 
 	if (trace->use_ip_header)
 		iphdr_size = IPHDR_SIZE;
-
 	options_size = 2;
-	if (!(ptr = ft_strnew(message->len + options_size)))
-		return ;
-	ft_memcpy(ptr, message->data, message->len);
-	message->data = ptr;
-
 	opt = 1;
 	ft_memcpy(message->data + iphdr_size + trace->protocol->len, &opt, 1);
 	//End of option list
-	ft_memcpy(message->data + iphdr_size + trace->protocol->len + 1, 0, 1);
+	opt = 0;
+	ft_memcpy(message->data + iphdr_size + trace->protocol->len + 1, &opt, 1);
 	message->packet_len += options_size;
+	message->len += options_size;
 }
 
 void		serialize_tcp_header(t_message *message, t_trace *trace, size_t iphdr_size)
