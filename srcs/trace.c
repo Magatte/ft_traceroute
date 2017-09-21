@@ -45,7 +45,12 @@ t_trace		*singleton_trace(void)
 	trace->use_ip_header = true;
 #endif
 	trace->dest_ip = NULL;
-	trace->source_ip = ft_strdup("10.11.9.3");
+
+	struct in_addr local;
+
+	local.s_addr = INADDR_ANY;
+
+	trace->source_ip = ft_strdup(get_hostname_ipv4(&local));
 	trace->ping_interval = DEFAULT_PING_INTERVAL;
 	if (!load_ip_tab(trace))
 		return (NULL);
@@ -135,6 +140,7 @@ BOOLEAN		process_loop(t_trace *trace)
 
 BOOLEAN		process_traceroute(t_trace *trace)
 {
+	ft_printf("host %s\n", trace->source_ip);
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_ip_tab(trace);
