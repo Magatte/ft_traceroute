@@ -23,8 +23,10 @@ void				check_packet(t_trace *trace, void *packet, int ret)
 		char *srcip = ft_strdup(get_hostname_ipv4(&message->ip_header.src));
 		char *destip = ft_strdup(get_hostname_ipv4(&message->ip_header.dest));
 
-		printf("\nIPHDR : DESTIP : %s, SRCIP : %s\n", destip, srcip);
-		printf("PORT : %d, SEQ : %d\n", message->tcp_header.dest, message->tcp_header.seq);
+		printf("\nIP_HEADER :\n");
+		printf("DESTIP: %s, SRCIP: %s, TTL: %d, LEN: %d\n", destip, srcip, message->ip_header.ttl, message->ip_header.len);
+		printf("TCP_HEADER :\n");
+		printf("PORT: %d, SEQ: %d\n", message->tcp_header.dest, message->tcp_header.seq);
 	}
 }
 
