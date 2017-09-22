@@ -66,6 +66,8 @@ t_message		*deserialize_message(void *ptr, t_trace *trace, int ptr_size)
 	}
 	trace->protocol->deserialize(message, trace);
 	message->packet_len -= trace->protocol->len;
+	message->len = ptr_size;
+	message->data = ptr;
 	return (message);
 }
 
