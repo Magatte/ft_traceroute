@@ -21,6 +21,8 @@ t_message	*new_message(size_t size)
 	ft_bzero(message, sizeof(t_message));
 	message->len = size;
 	message->serialize = serialize_message;
+	if (!(message->data = ft_strnew(message->len)))
+		return (NULL);
 	return (message);
 }
 
@@ -39,8 +41,6 @@ BOOLEAN		serialize_message(t_message *message, t_trace *trace)
 	//prepare protocol header
 	trace->protocol->prepare_header(message, trace);
 	//serialize message
-	if (!(message->data = ft_strnew(message->len)))
-		return (false);
 	trace->protocol->serialize(message, trace, iphdr_size);
 	if (trace->use_ip_header)
 	{

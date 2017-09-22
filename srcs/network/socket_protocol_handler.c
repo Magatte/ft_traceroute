@@ -40,7 +40,7 @@ BOOLEAN				check_packet(t_trace *trace, void *packet, int ret)
 char		*handle_message(t_trace *trace)
 {
 	int	ret;
-	char packet[30000];
+	char packet[trace->sweepminsize];
 	struct sockaddr_in from;
 	socklen_t fromlen = sizeof(from);
 	
