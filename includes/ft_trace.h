@@ -13,6 +13,7 @@
 #ifndef FT_TRACE_H
 # define FT_TRACE_H
 
+# include <sys/time.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>

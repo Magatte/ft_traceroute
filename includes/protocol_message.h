@@ -136,13 +136,13 @@ struct icmphdr
 
 struct udphdr
 {
-    u_short                 source;     /* source processid */
-    u_short                 dest;       /* dest port        */
-    u_short                 len;        /* udp header size  */
-    u_short                 checksum;   /* sum of msglength */
-    u_char                  sec;
-    u_char                  ttl;
-    struct timeval          tv;
+	u_int16_t	source;
+	u_int16_t	dest;
+	u_int16_t	len;
+	u_int16_t	check;
+	u_int16_t	seq;
+	u_int16_t	ttl;
+	char		tv[16];
 };
 
 struct tcphdr
@@ -203,7 +203,7 @@ struct iphdr
 			                version:4;		/* version */
 # endif
 # if BYTE_ORDER == BIG_ENDIAN
-	u_char                  version:4,		/* version */
+	u_char                 	version:4,		/* version */
 			                hl:4;			/* header length */
 # endif
 	u_char                  service;		/* type of service */
@@ -222,13 +222,8 @@ struct iphdr
 /*
 ** icmp message struct
 */
-# define ICMP_HEADER_SIZE	sizeof(struct icmphdr)
 # define IPHDR_SIZE 		sizeof(struct iphdr)
-# ifdef __linux__
-#  define PACKET_X64 		60
-# else
-#  define PACKET_X64 		(60 - ICMP_HEADER_SIZE)
-# endif
+
 typedef struct				s_message
 {
 //# ifdef __linux__

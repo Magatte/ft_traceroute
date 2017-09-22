@@ -43,9 +43,9 @@ t_trace		*singleton_trace(void)
 	trace->use_ip_header = true;
 #endif
 	trace->dest_ip = NULL;
-	trace->sweepminsize = 60 - trace->protocol->len;
+	trace->sweepminsize = (60 - trace->protocol->len);
 	if (trace->use_ip_header)
-		trace->sweepminsize -= ICMP_HEADER_SIZE;
+		trace->sweepminsize -= IPHDR_SIZE;
 	trace->sweepmaxsize = trace->sweepminsize;
 	struct in_addr local;
 
@@ -85,6 +85,9 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 	trace->send++;
 	trace->start_time = get_current_time_millis();
 	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
+
+		
+	ft_printf("whereto: %s\n", inet_ntoa(trace->addr.sin_addr));
 	if (res < 0)
 	{
 		ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
