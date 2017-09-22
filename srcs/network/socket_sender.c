@@ -25,8 +25,8 @@ BOOLEAN			initialize_socket_sender_connection(t_trace *trace)
 		}
 		return (false);
 	}
-	if (!bind_socket_sender(trace))
-		return (bind_error());
+	//if (!bind_socket_sender(trace))
+	//	return (bind_error());
 	if (!set_on_socket_sender_options(trace))
 		return (set_socket_options_error());
 	return (true);
