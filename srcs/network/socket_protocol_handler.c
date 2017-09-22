@@ -20,6 +20,7 @@ BOOLEAN				check_packet(t_trace *trace, void *packet, int ret)
 		return (true);
 	if (trace->protocol->e_name == TCP)
 	{
+		/*
 		char *srcip = ft_strdup(get_hostname_ipv4(&message->ip_header.src));
 		char *destip = ft_strdup(get_hostname_ipv4(&message->ip_header.dest));
 
@@ -27,11 +28,7 @@ BOOLEAN				check_packet(t_trace *trace, void *packet, int ret)
 		printf("DESTIP: %s, SRCIP: %s, TTL: %d, LEN: %d\n", destip, srcip, message->ip_header.ttl, message->ip_header.len);
 		printf("TCP_HEADER :\n");
 		printf("PORT: %d, SEQ: %d\n", ntohs(message->tcp_header.dest), ntohs(message->tcp_header.seq));
-		if (ntohs(message->tcp_header.dest) != trace->port)
-		{
-			free(message);
-			return (false);
-		}
+		*/
 	}
 	free(message);
 	return (true);

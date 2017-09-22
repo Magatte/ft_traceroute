@@ -173,7 +173,7 @@ void		prepare_tcp_header(t_message *message, t_trace *trace)
 	message->tcp_header.window = htons(5840);/* maximum allowed window size */
 	message->tcp_header.check = 0;
 	message->tcp_header.urg_ptr = 0;
-	add_tcp_options(message, trace);
+	//add_tcp_options(message, trace);
 }
 
 struct	timestamp_tcp_option

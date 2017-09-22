@@ -244,7 +244,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         "tcp",
         sizeof(struct tcphdr),
         TCP_PROTOCOL,
-        TCP_PROTOCOL,
+        ICMP_PROTOCOL,
         prepare_tcp_header,
         serialize_tcp_header,
         deserialize_tcp_header
