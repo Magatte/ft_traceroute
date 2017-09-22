@@ -29,7 +29,7 @@ void		prepare_iphdr(t_message *message, t_trace *trace)
 	message->ip_header.pid = htons(trace->pid);
 	message->ip_header.service = 0;
 	message->ip_header.off = 0;
-	message->ip_header.len = IPHDR_SIZE + trace->protocol->len + message->packet_len;
+	message->ip_header.len = 0;
 	message->ip_header.checksum = 0;
 	message->ip_header.checksum = 0;
 

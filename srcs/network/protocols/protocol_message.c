@@ -19,8 +19,10 @@ t_message	*new_message(size_t size)
 	if (!(message = (t_message*)malloc(sizeof(t_message))))
 		return (NULL);
 	ft_bzero(message, sizeof(t_message));
-	message->packet_len = size;
+	message->len = size;
 	message->serialize = serialize_message;
+	if (!(message->data = ft_strnew(message->len)))
+		return (NULL);
 	return (message);
 }
 
@@ -35,9 +37,7 @@ BOOLEAN		serialize_message(t_message *message, t_trace *trace)
 		prepare_iphdr(message, trace);
 	}
 	//set message total length
-	message->len = trace->protocol->len + iphdr_size + message->packet_len;
-	if (!(message->data = ft_strnew(iphdr_size + trace->protocol->len + message->packet_len)))
-		return (false);
+	message->packet_len = message->len - (trace->protocol->len + iphdr_size);
 	//prepare protocol header
 	trace->protocol->prepare_header(message, trace);
 	//serialize message
