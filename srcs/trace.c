@@ -48,11 +48,10 @@ t_trace		*singleton_trace(void)
 		trace->sweepminsize += IPHDR_SIZE;
 	trace->sweepmaxsize = trace->sweepminsize;
 	struct in_addr local;
-
 	local.s_addr = INADDR_ANY;
-
 	trace->source_ip = ft_strdup(get_hostname_ipv4(&local));
 	trace->ping_interval = DEFAULT_PING_INTERVAL;
+	trace->write_message = NULL;
 	if (!load_ip_tab(trace))
 		return (NULL);
 	return (trace);
@@ -60,9 +59,8 @@ t_trace		*singleton_trace(void)
 
 void		destruct_trace(t_trace *trace)
 {
-	int i;
+	int i = 0;
 
-	i = 0;
 	while (i < FLAGS_SIZE)
 	{
 		ft_strdel(&trace->flags[i]->name);
@@ -84,6 +82,12 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 
 	trace->send++;
 	trace->start_time = get_current_time_millis();
+	if (F_ASCII_DEBUG_MSG)
+	{
+		printf("\n   Packet > (%s) [", trace->dest_ip);
+		message->tostring(message);
+		printf("]\n");
+	}
 	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
 	
 	//ft_printf("whereto: %s\n", inet_ntoa(trace->addr.sin_addr));
@@ -102,19 +106,29 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 
 BOOLEAN		process_loop(t_trace *trace)
 {
-	int i;
-	//char *save_addr;
+	int i = 0;
 
-	i = 0;
-	//save_addr = ft_strdup(trace->destip);
 	while (i < NB_TEST_CONNECTION)
 	{
 		//Open socket connection
 		initialize_socket_receiver_connection(trace);
 		initialize_socket_sender_connection(trace);
 
+		if (i == 0)
+			ft_printf("%2d ", trace->ttl);
 		trace->message = new_message(trace->sweepminsize);
 		trace->message->serialize(trace->message, trace);
+
+		if (F_WRITING && trace->write_message != NULL)
+		{
+			int len = ft_strlen(trace->write_message);
+
+			if (len > (trace->message->packet_len - 1))
+				len = (trace->message->packet_len - 1);
+			if (len > 0) {
+				ft_memcpy(trace->message->data + (trace->message->len - trace->message->packet_len) + 1, trace->write_message, len);
+			}
+		}
 
 		send_message(trace, trace->message);
 		if ((trace->ip_tab[i] = handle_message(trace)) != NULL)
@@ -128,29 +142,51 @@ BOOLEAN		process_loop(t_trace *trace)
 		}
 		free(trace->message->data);
 		free(trace->message);
-		//free(trace->destip);
-		//trace->destip = ft_strdup(save_addr);
 		trace->sequence++;
 		//close socket connection
 		close(trace->sock);
 		close(trace->sock_snd);
 		i++;
 	}
-	//ft_strdel(&save_addr);
 	ft_printf("\n");
 	return (trace->retry);
 }
 
+static void	print_traceroute_stats(t_trace *trace)
+{
+	float	mintime = 0;
+	float	mediumtime = 0;
+	float	maxtime = 0;
+
+	if (trace->mintime != 0)
+		mintime = (((float)trace->mintime) / 1000);
+	if (trace->received != 0)
+		mediumtime = (trace->totaltime / trace->received) == 0 ? 0 : (((float)(trace->totaltime / trace->received)) / 1000);
+	if (trace->maxtime != 0)
+		maxtime = (((float)trace->maxtime) / 1000);
+	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", mintime, mediumtime, maxtime, maxtime - mintime);
+}
+
+void		on_traceroute_finished(t_trace *trace)
+{
+	if (!F_TIME_INFO)
+		return ;
+	printf("----------------------------------------------------------\n");
+	print_traceroute_stats(trace);
+}
+
 BOOLEAN		process_traceroute(t_trace *trace)
 {
-	ft_printf("host %s\n", trace->source_ip);
+	initialize_socket_receiver_connection(trace);
+	initialize_socket_sender_connection(trace);
+
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_ip_tab(trace);
-		ft_printf("%2d ", trace->ttl);
 		if (process_loop(trace) == false) {
 			free_ip_tab(trace);
-			break ;
+			on_traceroute_finished(trace);
+			return (true);
 		}
 		free_ip_tab(trace);
 		trace->ttl++;

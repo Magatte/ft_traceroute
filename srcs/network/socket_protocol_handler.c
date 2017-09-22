@@ -67,10 +67,12 @@ char		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
 	time_of = (get_current_time_millis() - trace->start_time);
 	printhost = ip_tab_contains(trace, &addr->sin_addr);
 
-	if (printhost == false)
+	if (printhost == false || F_ASCII_DEBUG_MSG)
 	{
-		if (trace->ip_tab[0] != NULL)
+		if (trace->ip_tab[0] != NULL && !F_ASCII_DEBUG_MSG)
 			ft_printf("\n   ");
+		if (F_ASCII_DEBUG_MSG)
+			ft_printf("  ");
 		ndd = get_hostname_by_in_addr(&addr->sin_addr);
 		if (!F_PRINT_HOP_ADDR)
 			ft_printf(" %s (%s)", ndd, ip_addr);

@@ -238,6 +238,7 @@ typedef struct				s_message
     int                     len;
     int                     packet_len;
     BOOLEAN                 (*serialize)();
+	void                    (*tostring)();
 }							t_message;
 
 #endif

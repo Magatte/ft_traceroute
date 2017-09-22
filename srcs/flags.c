@@ -150,9 +150,9 @@ BOOLEAN			load_size(t_trace *trace, char *arg)
 		ft_fprintf(1, "ft_traceroute: packet length must be > %d\n", trace->sweepminsize);
 		exit(0);
 	}
-	if (size > 32768)
+	if (size > MAX_PACKET_SIZE)
 	{
-		ft_fprintf(1, "ft_traceroute: packet length must be <= 32768\n");
+		ft_fprintf(1, "ft_traceroute: packet length must be <= %d\n", MAX_PACKET_SIZE);
 		exit(0);
 	}
 	trace->sweepminsize = size;
@@ -196,9 +196,9 @@ BOOLEAN			load_flags(t_trace *trace, int argc, char **argv)
 	}
 	while (i < argc)
 	{
-		if (trace->shost != NULL)
+		if (trace->shost != NULL && i == argc - 1)
 			load_size(trace, argv[i]);
-		else
+		else if (trace->shost == NULL)
 			load_host(trace, argv[i]);
 		activ_flags(trace, argv[i]);
 		if (select_value_special_flags(trace, i, argv[i], argv, argc)) {
@@ -238,5 +238,8 @@ BOOLEAN			load_flag_list(t_trace *trace)
 	trace->flags[6] = newflag(&(t_flag){false, "p", true, "[-p port]", NULL, 1, "ft_traceroute: invalid port: `%d' (0-32768)\n"});
 	trace->flags[7] = newflag(&(t_flag){false, "h", false, NULL, NULL, 0, NULL});
 	trace->flags[8] = newflag(&(t_flag){false, "iphdr", true, "[-iphdr]", NULL, -1, NULL});
+	trace->flags[9] = newflag(&(t_flag){false, "t", false, NULL, NULL, 0, NULL});
+	trace->flags[10] = newflag(&(t_flag){false, "a", false, NULL, NULL, 0, NULL});
+	trace->flags[11] = newflag(&(t_flag){false, "w", true, "[-w \"your text message\"]", NULL, 2, NULL});
 	return (true);
 }

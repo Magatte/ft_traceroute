@@ -68,5 +68,7 @@ BOOLEAN				set_flags_values(t_trace *trace)
 		return (print_error_args(trace->flags[6]->error, trace->port));
 	if (F_IP_HDR)
 		trace->use_ip_header = !trace->use_ip_header;
+	if (F_WRITING)
+		trace->write_message = trace->flags[11]->value;
 	return (true);
 }

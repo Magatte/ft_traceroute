@@ -60,14 +60,6 @@ BOOLEAN			set_on_socket_sender_options(t_trace *trace)
 	{
 		if ((setsockopt(trace->sock_snd, IPPROTO_IP, IP_HDRINCL, &opt, sizeof(opt))) != 0)
 			return (false);
-		/*
-		** L'option  SO_BROADCAST  demande  l'autorisation de pouvoir
-        ** diffuser des datagrammes "broadcast" sur la  socket.  Dans
-       	** les  premières versions du système, la diffusion broadcast
-       	** etait une option privilégiée.
-		*/
-		/*if (setsockopt(trace->sock_snd, SOL_SOCKET, SO_BROADCAST, (char*)&opt, sizeof(opt)) != 0)
-			return (false);*/
 	}
 	if (setsockopt(trace->sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&trace->timeout, sizeof(trace->timeout)) != 0)
 		return (false);

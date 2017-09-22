@@ -21,6 +21,7 @@ t_message	*new_message(size_t size)
 	ft_bzero(message, sizeof(t_message));
 	message->len = size;
 	message->serialize = serialize_message;
+	message->tostring = tostring;
 	if (!(message->data = ft_strnew(message->len)))
 		return (NULL);
 	return (message);
@@ -71,4 +72,23 @@ t_message		*deserialize_message(void *ptr, t_trace *trace, int ptr_size)
 void			destruct_message(t_message *message)
 {
 	free(message);
+}
+
+void			tostring(t_message *message)
+{
+	int 	i = 0;
+	char	msg[message->len + 1];
+
+	while (i < message->len)
+	{
+		char *m = (char*)message->data;
+
+		if (ft_isprint(m[i]))
+			msg[i] = m[i];
+		else
+			msg[i] = '.';
+		i++;
+	}
+	msg[i] = 0;
+	printf("%s (len: %d)", msg, message->len);
 }

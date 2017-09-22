@@ -103,11 +103,12 @@ typedef struct				s_trace
     int                     socket_type;
     char                    *source_ip;
     char                    *dest_ip;
+    char                    *write_message;
 }							t_trace;
 
 # define DEFAULT_PING_INTERVAL 3
 
-# define FLAGS_SIZE			9
+# define FLAGS_SIZE			12
 
 # define F_MAXHOPS			trace->flags[0]->actif
 # define F_FIRSTHOPS		trace->flags[1]->actif
@@ -118,8 +119,13 @@ typedef struct				s_trace
 # define F_PORT				trace->flags[6]->actif
 # define F_DEFAULT			trace->flags[7]->actif
 # define F_IP_HDR			trace->flags[8]->actif
+# define F_TIME_INFO		trace->flags[9]->actif
+# define F_ASCII_DEBUG_MSG	trace->flags[10]->actif
+# define F_WRITING	        trace->flags[11]->actif
 
 # define NB_TEST_CONNECTION	3
+
+# define MAX_PACKET_SIZE 65535
 
 /*
 ** Socket connection
@@ -158,6 +164,7 @@ t_message					*new_message(size_t size);
 BOOLEAN						serialize_message(t_message *message, t_trace *trace);
 void						destruct_message(t_message *packet);
 t_message		            *deserialize_message(void *ptr, t_trace *trace, int ptr_size);
+void			            tostring(t_message *message);
 
 /*
 ** Handler
