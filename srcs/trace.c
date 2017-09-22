@@ -31,8 +31,6 @@ t_trace		*singleton_trace(void)
 	trace->pid = (getpid() & 0xFFFF) | 0x8000;
 	trace->ttl = 1;
 	trace->sweepincrsize = 0;
-	trace->sweepminsize = PACKET_X64;
-	trace->sweepmaxsize = PACKET_X64;
 	trace->mintime = 0;
 	trace->totaltime = 0;
 	trace->maxtime = 0;
@@ -45,7 +43,10 @@ t_trace		*singleton_trace(void)
 	trace->use_ip_header = true;
 #endif
 	trace->dest_ip = NULL;
-
+	trace->sweepminsize = 60 - trace->protocol->len;
+	if (trace->use_ip_header)
+		trace->sweepminsize -= ICMP_HEADER_SIZE;
+	trace->sweepmaxsize = trace->sweepminsize;
 	struct in_addr local;
 
 	local.s_addr = INADDR_ANY;
