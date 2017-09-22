@@ -27,23 +27,9 @@ void		prepare_udp_header(t_message *message, t_trace *trace)
 
 void		serialize_udp_header(t_message *message, t_trace *trace, size_t iphdr_size)
 {
-	ft_printf("iphdr1 :%d, iphdr2:%d, udphdr: %d\n", sizeof(struct iphdr), iphdr_size, sizeof(struct udphdr));
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
 	message->udp_header.check = 0;
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
-
-	int i = 0;
-	ft_printf("\n");
-	while (i < (int)trace->protocol->len)
-	{
-		char *tmp = message->data;
-		if (ft_isprint(tmp[iphdr_size + i]))
-			ft_printf("%c", tmp[iphdr_size + i]);
-		else
-			ft_printf(".");
-		i++;
-	}
-	ft_printf("\n");
 }
 
 void		deserialize_udp_header(t_message *message, t_trace *trace)

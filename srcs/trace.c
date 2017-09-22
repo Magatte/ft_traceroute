@@ -85,9 +85,8 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 	trace->send++;
 	trace->start_time = get_current_time_millis();
 	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
-
-		
-	ft_printf("whereto: %s\n", inet_ntoa(trace->addr.sin_addr));
+	
+	//ft_printf("whereto: %s\n", inet_ntoa(trace->addr.sin_addr));
 	if (res < 0)
 	{
 		ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
