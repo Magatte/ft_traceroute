@@ -30,6 +30,18 @@ void		serialize_udp_header(t_message *message, t_trace *trace, size_t iphdr_size
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
 	message->udp_header.checksum = 0;
 	ft_memcpy(message->data + iphdr_size, &message->udp_header, trace->protocol->len);
+
+	int i = 0;
+	ft_printf("\n");
+	while (i < (int)trace->protocol->len)
+	{
+		if (ft_isascii((char)(message->data + iphdr_size + i)))
+			ft_printf("%c", (char)(message->data + iphdr_size + i));
+		else
+			ft_printf(".");
+		i++;
+	}
+	ft_printf("\n");
 }
 
 void		deserialize_udp_header(t_message *message, t_trace *trace)
