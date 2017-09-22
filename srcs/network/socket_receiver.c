@@ -14,7 +14,7 @@
 
 BOOLEAN			initialize_socket_receiver_connection(t_trace *trace)
 {
-	trace->sock = socket(PROT_INTERNET_IPV4, trace->socket_type, ICMP_PROTOCOL);
+	trace->sock = socket(PROT_INTERNET_IPV4, trace->socket_type, trace->protocol->proto_sock_recv);
 	if (!socket_connection_is_estabilised(trace->sock))
 	{
 		if (trace->sock && trace->socket_type == SOCK_RAW)

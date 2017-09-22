@@ -43,9 +43,9 @@ t_trace		*singleton_trace(void)
 	trace->use_ip_header = true;
 #endif
 	trace->dest_ip = NULL;
-	trace->sweepminsize = (60 - trace->protocol->len);
+	trace->sweepminsize = trace->protocol->len;
 	if (trace->use_ip_header)
-		trace->sweepminsize -= IPHDR_SIZE;
+		trace->sweepminsize += IPHDR_SIZE;
 	trace->sweepmaxsize = trace->sweepminsize;
 	struct in_addr local;
 

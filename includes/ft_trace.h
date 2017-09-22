@@ -61,6 +61,7 @@ struct protocole
 	char					*name;
     size_t                  len;
     int                     proto;
+    int                     proto_sock_recv;
     void                    (*prepare_header)();
 	void					(*serialize)();
     void                    (*deserialize)();
@@ -212,6 +213,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         "ip",
         sizeof(struct iphdr),
         DEFAULT_PROTOCOL,
+        DEFAULT_PROTOCOL,
         prepare_iphdr,
         serialize_ip_header,
         NULL
@@ -222,6 +224,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         "icmp",
         sizeof(struct icmphdr),
         ICMP_PROTOCOL,
+        ICMP_PROTOCOL,
         prepare_icmp_header,
         serialize_icmp_header,
         deserialize_icmp_header
@@ -231,6 +234,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         "udp",
         sizeof(struct udphdr),
         UDP_PROTOCOL,
+        ICMP_PROTOCOL,
         prepare_udp_header,
         serialize_udp_header,
         deserialize_udp_header
@@ -239,6 +243,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         TCP,
         "tcp",
         sizeof(struct tcphdr),
+        TCP_PROTOCOL,
         TCP_PROTOCOL,
         prepare_tcp_header,
         serialize_tcp_header,
@@ -249,6 +254,7 @@ static const struct protocole protos[MAX_PROTOCOLS] = {
         "gre",
         sizeof(struct grehdr),
         GRE_PROTOCOL,
+        ICMP_PROTOCOL,
         prepare_gre_header,
         serialize_gre_header,
         deserialize_gre_header
