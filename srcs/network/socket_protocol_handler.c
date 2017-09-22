@@ -18,17 +18,11 @@ BOOLEAN				check_packet(t_trace *trace, void *packet, int ret)
 
 	if (!(message = deserialize_message(packet, trace, ret)))
 		return (true);
-	if (trace->protocol->e_name == TCP)
+	if (F_ASCII_DEBUG_MSG)
 	{
-		/*
-		char *srcip = ft_strdup(get_hostname_ipv4(&message->ip_header.src));
-		char *destip = ft_strdup(get_hostname_ipv4(&message->ip_header.dest));
-
-		printf("\nIP_HEADER :\n");
-		printf("DESTIP: %s, SRCIP: %s, TTL: %d, LEN: %d\n", destip, srcip, message->ip_header.ttl, message->ip_header.len);
-		printf("TCP_HEADER :\n");
-		printf("PORT: %d, SEQ: %d\n", ntohs(message->tcp_header.dest), ntohs(message->tcp_header.seq));
-		*/
+		printf("   Packet < (%s) [", trace->dest_ip);
+		message->tostring(message);
+		printf("]\n");
 	}
 	free(message);
 	return (true);
