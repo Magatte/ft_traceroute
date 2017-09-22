@@ -52,10 +52,12 @@ BOOLEAN				set_flags_values(t_trace *trace)
 	if (F_PROTOCOL)
 	{
 		trace->sweepminsize -= trace->protocol->len;
+		if (trace->use_ip_header)
+			trace->sweepminsize -= IPHDR_SIZE;
 		trace->protocol = get_protocol_by_name(trace->flags[5]->value);
 		if (trace->protocol == NULL)
 			return (print_error_args_string(trace->flags[5]->error, trace->flags[5]->value));
-		trace->sweepminsize = trace->protocol->len;
+		trace->sweepminsize = trace->protocol->len + trace->sweepminsize;
 		if (trace->use_ip_header)
 			trace->sweepminsize += IPHDR_SIZE;
 		trace->sweepmaxsize = trace->sweepminsize;
