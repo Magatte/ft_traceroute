@@ -22,7 +22,7 @@ t_trace		*singleton_trace(void)
 		return (NULL);
 	trace->sequence = 0;
 	trace->shost = NULL;
-	//trace->destip = NULL;
+	trace->addr = NULL;
 	trace->port = 80;
 	trace->launch = process_traceroute;
 	trace->received = 0;
@@ -30,7 +30,6 @@ t_trace		*singleton_trace(void)
 	trace->timeout.tv_sec = 5;
 	trace->pid = (getpid() & 0xFFFF) | 0x8000;
 	trace->ttl = 1;
-	trace->sweepincrsize = 0;
 	trace->mintime = 0;
 	trace->totaltime = 0;
 	trace->maxtime = 0;
@@ -50,10 +49,8 @@ t_trace		*singleton_trace(void)
 	struct in_addr local;
 	local.s_addr = INADDR_ANY;
 	trace->source_ip = ft_strdup(get_hostname_ipv4(&local));
-	trace->ping_interval = DEFAULT_PING_INTERVAL;
 	trace->write_message = NULL;
-	if (!load_ip_tab(trace))
-		return (NULL);
+	trace->interval_number_connection = NB_DEFAULT_INTERVAL_CONNECTION;
 	return (trace);
 }
 
@@ -66,12 +63,20 @@ void		destruct_trace(t_trace *trace)
 		ft_strdel(&trace->flags[i]->name);
 		ft_strdel(&trace->flags[i]->error);
 		ft_strdel(&trace->flags[i]->help);
+		free(trace->flags[i]);
 		i++;
 	}
 	free(trace->flags);
+	if (trace->addr != NULL)
+		free(trace->addr);
 	if (trace->shost != NULL)
 		ft_strdel(&trace->shost);
-	//ft_strdel(&trace->destip);
+	if (trace->source_ip != NULL)
+		ft_strdel(&trace->source_ip);
+	if (trace->dest_ip != NULL)
+		ft_strdel(&trace->dest_ip);
+	if (trace->write_message != NULL)
+		ft_strdel(&trace->write_message);
 	free(trace->ip_tab);
 	free(trace);
 }
@@ -88,9 +93,8 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 		message->tostring(message);
 		printf("]\n");
 	}
-	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)&trace->addr, sizeof(trace->addr));
+	res = sendto(trace->sock, message->data, message->len, MSG_DONTWAIT, (struct sockaddr*)trace->addr, sizeof(*trace->addr));
 	
-	//ft_printf("whereto: %s\n", inet_ntoa(trace->addr.sin_addr));
 	if (res < 0)
 	{
 		ft_fprintf(1, "ft_traceroute: sendto: Network is unreachable\n");
@@ -106,9 +110,9 @@ BOOLEAN		send_message(t_trace *trace, t_message *message)
 
 BOOLEAN		process_loop(t_trace *trace)
 {
-	int i = 0;
+	int		i = 0;
 
-	while (i < NB_TEST_CONNECTION)
+	while (i < trace->interval_number_connection)
 	{
 		//Open socket connection
 		initialize_socket_receiver_connection(trace);
@@ -140,8 +144,7 @@ BOOLEAN		process_loop(t_trace *trace)
 		{
 			ft_printf(" *");
 		}
-		free(trace->message->data);
-		free(trace->message);
+		destruct_message(trace->message);
 		trace->sequence++;
 		//close socket connection
 		close(trace->sock);
@@ -177,9 +180,8 @@ void		on_traceroute_finished(t_trace *trace)
 
 BOOLEAN		process_traceroute(t_trace *trace)
 {
-	initialize_socket_receiver_connection(trace);
-	initialize_socket_sender_connection(trace);
-
+	if (!load_ip_tab(trace))
+			return (false);
 	while (trace->ttl <= trace->max_hop && trace->retry)
 	{
 		reset_ip_tab(trace);

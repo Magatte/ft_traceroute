@@ -76,8 +76,9 @@ typedef struct				s_trace
 	int						port;		/* port of connection			*/
 	int						sock;		/* socket Protocol			    */
     int                     sock_snd;   /* socket RAW sender            */
-	struct sockaddr_in		addr;		/* sockaddr of destination		*/
-	//char					*destip;	/* ip of Destination			*/
+	struct sockaddr_in		*addr;		/* sockaddr of destination		*/
+    char                    *source_ip;
+    char                    *dest_ip;
 	int						pid;		/* pid of current program		*/
 	int						ttl;		/* time to live  				*/
 	int						max_hop;
@@ -86,7 +87,6 @@ typedef struct				s_trace
 	int						send;		/* total sended messages  		*/
 	int						sweepmaxsize;
 	int						sweepminsize;
-	int						sweepincrsize;
 	t_flag					**flags;	/* map of flags					*/
 	BOOLEAN					(*launch)();/* pointer of function launch	*/
 	long					start_time;	/* timer						*/
@@ -97,18 +97,14 @@ typedef struct				s_trace
 	char			        **ip_tab;
 	const struct protocole	*protocol;
 	t_message				*message;
-	int						ping_interval;
 	BOOLEAN					retry;
     BOOLEAN                 use_ip_header;
     int                     socket_type;
-    char                    *source_ip;
-    char                    *dest_ip;
     char                    *write_message;
+    int                     interval_number_connection;
 }							t_trace;
 
-# define DEFAULT_PING_INTERVAL 3
-
-# define FLAGS_SIZE			12
+# define FLAGS_SIZE			13
 
 # define F_MAXHOPS			trace->flags[0]->actif
 # define F_FIRSTHOPS		trace->flags[1]->actif
@@ -122,8 +118,9 @@ typedef struct				s_trace
 # define F_TIME_INFO		trace->flags[9]->actif
 # define F_ASCII_DEBUG_MSG	trace->flags[10]->actif
 # define F_WRITING	        trace->flags[11]->actif
+# define F_INTERVAL_CONNECTION trace->flags[12]->actif
 
-# define NB_TEST_CONNECTION	3
+# define NB_DEFAULT_INTERVAL_CONNECTION	3
 
 # define MAX_PACKET_SIZE 65535
 
@@ -183,6 +180,8 @@ struct sockaddr_in			*get_sockaddr_in_ipv4(char *host);
 char						*get_hostname_by_in_addr(const struct in_addr *addr);
 const struct protocole    	*get_protocol(t_proto_enum e);
 const struct protocole    	*get_protocol_by_name(char *name);
+int                         get_count_of_host_ipv4(char *host, int ai_protocol);
+struct	sockaddr_in	        **get_all_sockaddr_in_ipv4(char *host, int ai_protocol);
 
 /*
 ** Array ip tab

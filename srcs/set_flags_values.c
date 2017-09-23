@@ -66,9 +66,23 @@ BOOLEAN				set_flags_values(t_trace *trace)
 		trace->port = ft_atoi(trace->flags[6]->value);
 	if (trace->port < 1 || trace->port > 32768)
 		return (print_error_args(trace->flags[6]->error, trace->port));
-	if (F_IP_HDR)
-		trace->use_ip_header = !trace->use_ip_header;
+	if (F_IP_HDR && ft_strcmp(trace->flags[8]->value, "true") == 0)
+	{
+		if (!trace->use_ip_header)
+			trace->sweepminsize += IPHDR_SIZE;
+		trace->use_ip_header = true;
+	}
+	else if (F_IP_HDR && ft_strcmp(trace->flags[8]->value, "false") == 0)
+	{
+		if (trace->use_ip_header)
+			trace->sweepminsize -= IPHDR_SIZE;
+		trace->use_ip_header = false;
+	}
 	if (F_WRITING)
 		trace->write_message = trace->flags[11]->value;
+	if (F_INTERVAL_CONNECTION)
+		trace->interval_number_connection = ft_atoi(trace->flags[12]->value);
+	if (trace->interval_number_connection > 255)
+		return (print_error(trace->flags[12]->error));
 	return (true);
 }

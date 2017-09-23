@@ -161,7 +161,8 @@ BOOLEAN			load_size(t_trace *trace, char *arg)
 
 BOOLEAN			load_host(t_trace *trace, char *arg)
 {
-	struct sockaddr_in *in;
+	struct sockaddr_in 	*in;
+	int					count_ip;
 
 	if (arg[0] == '-')
 		return (false);
@@ -171,12 +172,16 @@ BOOLEAN			load_host(t_trace *trace, char *arg)
 		exit(0);
 	}
 	trace->shost = ft_strdup(arg);
+	count_ip = get_count_of_host_ipv4(trace->shost, TCP_PROTOCOL);
 	in = get_sockaddr_in_ipv4(trace->shost);
-	if (in == NULL) {
+	if (in == NULL)
 		return (false);
-	}
-	trace->addr = *in;
+	trace->addr = in;
 	trace->dest_ip = ft_strdup(get_hostname_ipv4(&in->sin_addr));
+	if (count_ip > 1)
+	{
+		ft_printf("traceroute: Warning: %s has multiple addresses; using %s\n", trace->shost, trace->dest_ip);
+	}
 	return (true);
 }
 
@@ -235,11 +240,12 @@ BOOLEAN			load_flag_list(t_trace *trace)
 	trace->flags[3] = newflag(&(t_flag){false, "d", false, NULL, NULL, 0, NULL});
 	trace->flags[4] = newflag(&(t_flag){false, "r", false, NULL, NULL, 0, NULL});
 	trace->flags[5] = newflag(&(t_flag){false, "P", true, "[-P protocol]", NULL, 0, "Cannot handle `protocol' keyword with arg `%s' (icmp, udp, tcp, gre)\n"});
-	trace->flags[6] = newflag(&(t_flag){false, "p", true, "[-p port]", NULL, 1, "ft_traceroute: invalid port: `%d' (0-32768)\n"});
+	trace->flags[6] = newflag(&(t_flag){false, "p", true, "\n[-p port]", NULL, 1, "ft_traceroute: invalid port: `%d' (0-32768)\n"});
 	trace->flags[7] = newflag(&(t_flag){false, "h", false, NULL, NULL, 0, NULL});
-	trace->flags[8] = newflag(&(t_flag){false, "iphdr", true, "[-iphdr]", NULL, -1, NULL});
+	trace->flags[8] = newflag(&(t_flag){false, "I", true, "[-I true or false]", NULL, 2, NULL});
 	trace->flags[9] = newflag(&(t_flag){false, "t", false, NULL, NULL, 0, NULL});
 	trace->flags[10] = newflag(&(t_flag){false, "a", false, NULL, NULL, 0, NULL});
 	trace->flags[11] = newflag(&(t_flag){false, "w", true, "[-w \"your text message\"]", NULL, 2, NULL});
+	trace->flags[12] = newflag(&(t_flag){false, "i", true, "[-i interval number of connection]", NULL, 1, "max interval connection cannot be more than 255"});
 	return (true);
 }

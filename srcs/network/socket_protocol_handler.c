@@ -56,20 +56,25 @@ char		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
 	float			n_response_time;
 	char			*response_time;
 
-	
-	ip_addr = ft_strdup(get_hostname_ipv4(&addr->sin_addr));
+	if (!(ip_addr = ft_strdup(get_hostname_ipv4(&addr->sin_addr))))
+		return (NULL);
 	time_of = (get_current_time_millis() - trace->start_time);
 	printhost = ip_tab_contains(trace, &addr->sin_addr);
 
-	if (printhost == false || F_ASCII_DEBUG_MSG)
+	if (printhost == false || F_ASCII_DEBUG_MSG || F_INTERVAL_CONNECTION)
 	{
 		if (trace->ip_tab[0] != NULL && !F_ASCII_DEBUG_MSG)
 			ft_printf("\n   ");
 		if (F_ASCII_DEBUG_MSG)
 			ft_printf("  ");
-		ndd = get_hostname_by_in_addr(&addr->sin_addr);
+		if (!(ndd = get_hostname_by_in_addr(&addr->sin_addr)))
+			return (NULL);
 		if (!F_PRINT_HOP_ADDR)
-			ft_printf(" %s (%s)", ndd, ip_addr);
+		{
+			ft_putstr(" ");
+			ft_putstr(ndd);
+			ft_printf(" (%s)", ip_addr);
+		}
 		else
 			ft_printf(" %s ", ip_addr);
 		ft_strdel(&ndd);
@@ -77,8 +82,8 @@ char		*process_received_message(t_trace *trace, struct sockaddr_in *addr)
 	n_response_time = (time_of / (float)1000);
 	if (n_response_time < 0)
 		n_response_time = 0;
-	response_time = ft_convert_double_to_string(n_response_time, 3);
-
+	if (!(response_time = ft_convert_double_to_string(n_response_time, 3)))
+		return (NULL);
 	ft_printf(" %s ms ", response_time);
 	ft_strdel(&response_time);
 	trace->totaltime += time_of;

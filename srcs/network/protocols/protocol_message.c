@@ -73,6 +73,8 @@ t_message		*deserialize_message(void *ptr, t_trace *trace, int ptr_size)
 
 void			destruct_message(t_message *message)
 {
+	if (message->data != NULL)
+		free(message->data);
 	free(message);
 }
 

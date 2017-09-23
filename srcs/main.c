@@ -30,7 +30,7 @@ int	main(int argc, char **argv)
 		if (!load_flags(trace, argc, argv))
 			return (0);
 		if (!set_flags_values(trace))
-			return (0);
+			return (false);
 		if (trace->dest_ip)
 		{
 			printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", trace->shost, trace->dest_ip, trace->max_hop, trace->sweepminsize);
